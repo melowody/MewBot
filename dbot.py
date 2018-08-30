@@ -349,6 +349,13 @@ async def optifine(ctx):
     await ctx.message.channel.send(percent + reason)
 '''
 
+@client.command(pass_context=True, aliases=["8ball", "8b"])
+async def eightball(ctx, *args):
+    message = ' '.join(args)
+    out = ""
+    out += ":8ball: " + str(ctx.message.author.mention) + ": " + message + "\nMy Response: " + modnar.choice(["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no", "Outlook not so good.", "Very doubtful"])
+    await ctx.message.channel.send(out)
+
 def savepokemon(ctx):
     z = ['https://cdn.bulbagarden.net/upload/2/21/001Bulbasaur.png', 'https://cdn.bulbagarden.net/upload/7/73/002Ivysaur.png', 'https://cdn.bulbagarden.net/upload/a/ae/003Venusaur.png', 'https://cdn.bulbagarden.net/upload/7/73/004Charmander.png', 'https://cdn.bulbagarden.net/upload/4/4a/005Charmeleon.png', 'https://cdn.bulbagarden.net/upload/7/7e/006Charizard.png', 'https://cdn.bulbagarden.net/upload/3/39/007Squirtle.png', 'https://cdn.bulbagarden.net/upload/0/0c/008Wartortle.png', 'https://cdn.bulbagarden.net/upload/0/02/009Blastoise.png', 'https://cdn.bulbagarden.net/upload/5/5d/010Caterpie.png', 'https://cdn.bulbagarden.net/upload/c/cd/011Metapod.png', 'https://cdn.bulbagarden.net/upload/d/d1/012Butterfree.png', 'https://cdn.bulbagarden.net/upload/d/df/013Weedle.png', 'https://cdn.bulbagarden.net/upload/f/f0/014Kakuna.png', 'https://cdn.bulbagarden.net/upload/6/61/015Beedrill.png', 'https://cdn.bulbagarden.net/upload/5/55/016Pidgey.png', 'https://cdn.bulbagarden.net/upload/7/7a/017Pidgeotto.png', 'https://cdn.bulbagarden.net/upload/5/57/018Pidgeot.png', 'https://cdn.bulbagarden.net/upload/4/46/019Rattata.png', 'https://cdn.bulbagarden.net/upload/f/f4/020Raticate.png', 'https://cdn.bulbagarden.net/upload/8/8b/021Spearow.png', 'https://cdn.bulbagarden.net/upload/a/a0/022Fearow.png', 'https://cdn.bulbagarden.net/upload/f/fa/023Ekans.png', 'https://cdn.bulbagarden.net/upload/c/cd/024Arbok.png', 'https://cdn.bulbagarden.net/upload/0/0d/025Pikachu.png', 'https://cdn.bulbagarden.net/upload/8/88/026Raichu.png', 'https://cdn.bulbagarden.net/upload/9/9e/027Sandshrew.png', 'https://cdn.bulbagarden.net/upload/0/0b/028Sandslash.png', 'https://cdn.bulbagarden.net/upload/8/81/029Nidoran.png', 'https://cdn.bulbagarden.net/upload/c/cd/030Nidorina.png', 'https://cdn.bulbagarden.net/upload/b/bf/031Nidoqueen.png', 'https://cdn.bulbagarden.net/upload/4/4a/032Nidoran.png', 'https://cdn.bulbagarden.net/upload/9/9f/033Nidorino.png', 'https://cdn.bulbagarden.net/upload/c/c6/034Nidoking.png', 'https://cdn.bulbagarden.net/upload/f/f4/035Clefairy.png', 'https://cdn.bulbagarden.net/upload/a/a9/036Clefable.png', 'https://cdn.bulbagarden.net/upload/6/60/037Vulpix.png', 'https://cdn.bulbagarden.net/upload/0/05/038Ninetales.png', 'https://cdn.bulbagarden.net/upload/3/3e/039Jigglypuff.png', 'https://cdn.bulbagarden.net/upload/9/92/040Wigglytuff.png', 'https://cdn.bulbagarden.net/upload/d/da/041Zubat.png', 'https://cdn.bulbagarden.net/upload/0/0c/042Golbat.png', 'https://cdn.bulbagarden.net/upload/4/43/043Oddish.png', 'https://cdn.bulbagarden.net/upload/2/2a/044Gloom.png', 'https://cdn.bulbagarden.net/upload/6/6a/045Vileplume.png', 'https://cdn.bulbagarden.net/upload/d/d4/046Paras.png', 'https://cdn.bulbagarden.net/upload/8/80/047Parasect.png', 'https://cdn.bulbagarden.net/upload/a/ad/048Venonat.png', 'https://cdn.bulbagarden.net/upload/d/d3/049Venomoth.png', 'https://cdn.bulbagarden.net/upload/3/31/050Diglett.png', 'https://cdn.bulbagarden.net/upload/e/e5/051Dugtrio.png', 'https://cdn.bulbagarden.net/upload/d/d6/052Meowth.png', 'https://cdn.bulbagarden.net/upload/1/13/053Persian.png', 'https://cdn.bulbagarden.net/upload/5/53/054Psyduck.png', 'https://cdn.bulbagarden.net/upload/f/fe/055Golduck.png', 'https://cdn.bulbagarden.net/upload/4/41/056Mankey.png', 'https://cdn.bulbagarden.net/upload/9/9a/057Primeape.png', 'https://cdn.bulbagarden.net/upload/3/3d/058Growlithe.png', 'https://cdn.bulbagarden.net/upload/b/b8/059Arcanine.png', 'https://cdn.bulbagarden.net/upload/4/49/060Poliwag.png', 'https://cdn.bulbagarden.net/upload/a/a9/061Poliwhirl.png', 'https://cdn.bulbagarden.net/upload/2/2d/062Poliwrath.png', 'https://cdn.bulbagarden.net/upload/6/62/063Abra.png', 'https://cdn.bulbagarden.net/upload/9/97/064Kadabra.png', 'https://cdn.bulbagarden.net/upload/c/cc/065Alakazam.png', 'https://cdn.bulbagarden.net/upload/8/85/066Machop.png', 'https://cdn.bulbagarden.net/upload/8/8e/067Machoke.png', 'https://cdn.bulbagarden.net/upload/8/8f/068Machamp.png', 'https://cdn.bulbagarden.net/upload/a/a2/069Bellsprout.png', 'https://cdn.bulbagarden.net/upload/9/9f/070Weepinbell.png', 'https://cdn.bulbagarden.net/upload/b/be/071Victreebel.png', 'https://cdn.bulbagarden.net/upload/4/4e/072Tentacool.png', 'https://cdn.bulbagarden.net/upload/f/f6/073Tentacruel.png', 'https://cdn.bulbagarden.net/upload/9/98/074Geodude.png', 'https://cdn.bulbagarden.net/upload/7/75/075Graveler.png', 'https://cdn.bulbagarden.net/upload/f/f2/076Golem.png', 'https://cdn.bulbagarden.net/upload/3/3b/077Ponyta.png', 'https://cdn.bulbagarden.net/upload/3/3f/078Rapidash.png', 'https://cdn.bulbagarden.net/upload/7/70/079Slowpoke.png', 'https://cdn.bulbagarden.net/upload/8/80/080Slowbro.png', 'https://cdn.bulbagarden.net/upload/6/6c/081Magnemite.png', 'https://cdn.bulbagarden.net/upload/7/72/082Magneton.png', 'https://cdn.bulbagarden.net/upload/f/f8/083Farfetch%27d.png', 'https://cdn.bulbagarden.net/upload/5/54/084Doduo.png', 'https://cdn.bulbagarden.net/upload/9/93/085Dodrio.png', 'https://cdn.bulbagarden.net/upload/1/1f/086Seel.png', 'https://cdn.bulbagarden.net/upload/c/c7/087Dewgong.png', 'https://cdn.bulbagarden.net/upload/a/a0/088Grimer.png', 'https://cdn.bulbagarden.net/upload/7/7c/089Muk.png', 'https://cdn.bulbagarden.net/upload/4/40/090Shellder.png', 'https://cdn.bulbagarden.net/upload/1/1d/091Cloyster.png', 'https://cdn.bulbagarden.net/upload/c/ca/092Gastly.png', 'https://cdn.bulbagarden.net/upload/6/62/093Haunter.png', 'https://cdn.bulbagarden.net/upload/c/c6/094Gengar.png', 'https://cdn.bulbagarden.net/upload/9/9a/095Onix.png', 'https://cdn.bulbagarden.net/upload/3/3e/096Drowzee.png', 'https://cdn.bulbagarden.net/upload/0/0a/097Hypno.png', 'https://cdn.bulbagarden.net/upload/a/a7/098Krabby.png', 'https://cdn.bulbagarden.net/upload/7/71/099Kingler.png', 'https://cdn.bulbagarden.net/upload/d/da/100Voltorb.png', 'https://cdn.bulbagarden.net/upload/8/84/101Electrode.png', 'https://cdn.bulbagarden.net/upload/a/af/102Exeggcute.png', 'https://cdn.bulbagarden.net/upload/2/24/103Exeggutor.png', 'https://cdn.bulbagarden.net/upload/2/2a/104Cubone.png', 'https://cdn.bulbagarden.net/upload/9/98/105Marowak.png', 'https://cdn.bulbagarden.net/upload/3/32/106Hitmonlee.png', 'https://cdn.bulbagarden.net/upload/a/a3/107Hitmonchan.png', 'https://cdn.bulbagarden.net/upload/0/00/108Lickitung.png', 'https://cdn.bulbagarden.net/upload/1/17/109Koffing.png', 'https://cdn.bulbagarden.net/upload/4/42/110Weezing.png', 'https://cdn.bulbagarden.net/upload/9/9b/111Rhyhorn.png', 'https://cdn.bulbagarden.net/upload/4/47/112Rhydon.png', 'https://cdn.bulbagarden.net/upload/c/cd/113Chansey.png', 'https://cdn.bulbagarden.net/upload/3/3e/114Tangela.png', 'https://cdn.bulbagarden.net/upload/4/4e/115Kangaskhan.png', 'https://cdn.bulbagarden.net/upload/5/5a/116Horsea.png', 'https://cdn.bulbagarden.net/upload/2/26/117Seadra.png', 'https://cdn.bulbagarden.net/upload/7/7b/118Goldeen.png', 'https://cdn.bulbagarden.net/upload/6/6a/119Seaking.png', 'https://cdn.bulbagarden.net/upload/4/4f/120Staryu.png', 'https://cdn.bulbagarden.net/upload/c/cd/121Starmie.png', 'https://cdn.bulbagarden.net/upload/e/ec/122Mr._Mime.png', 'https://cdn.bulbagarden.net/upload/b/ba/123Scyther.png', 'https://cdn.bulbagarden.net/upload/7/7c/124Jynx.png', 'https://cdn.bulbagarden.net/upload/d/de/125Electabuzz.png', 'https://cdn.bulbagarden.net/upload/8/8c/126Magmar.png', 'https://cdn.bulbagarden.net/upload/7/71/127Pinsir.png', 'https://cdn.bulbagarden.net/upload/b/b8/128Tauros.png', 'https://cdn.bulbagarden.net/upload/0/02/129Magikarp.png', 'https://cdn.bulbagarden.net/upload/4/41/130Gyarados.png', 'https://cdn.bulbagarden.net/upload/a/ab/131Lapras.png', 'https://cdn.bulbagarden.net/upload/3/36/132Ditto.png', 'https://cdn.bulbagarden.net/upload/e/e2/133Eevee.png', 'https://cdn.bulbagarden.net/upload/f/fd/134Vaporeon.png', 'https://cdn.bulbagarden.net/upload/b/bb/135Jolteon.png', 'https://cdn.bulbagarden.net/upload/d/dd/136Flareon.png', 'https://cdn.bulbagarden.net/upload/6/6b/137Porygon.png', 'https://cdn.bulbagarden.net/upload/7/79/138Omanyte.png', 'https://cdn.bulbagarden.net/upload/4/43/139Omastar.png', 'https://cdn.bulbagarden.net/upload/f/f9/140Kabuto.png', 'https://cdn.bulbagarden.net/upload/2/29/141Kabutops.png', 'https://cdn.bulbagarden.net/upload/e/e8/142Aerodactyl.png', 'https://cdn.bulbagarden.net/upload/f/fb/143Snorlax.png', 'https://cdn.bulbagarden.net/upload/4/4e/144Articuno.png', 'https://cdn.bulbagarden.net/upload/e/e3/145Zapdos.png', 'https://cdn.bulbagarden.net/upload/1/1b/146Moltres.png', 'https://cdn.bulbagarden.net/upload/c/cc/147Dratini.png', 'https://cdn.bulbagarden.net/upload/9/93/148Dragonair.png', 'https://cdn.bulbagarden.net/upload/8/8b/149Dragonite.png', 'https://cdn.bulbagarden.net/upload/7/78/150Mewtwo.png', 'https://cdn.bulbagarden.net/upload/b/b1/151Mew.png', 'https://cdn.bulbagarden.net/upload/b/bf/152Chikorita.png', 'https://cdn.bulbagarden.net/upload/c/ca/153Bayleef.png', 'https://cdn.bulbagarden.net/upload/d/d1/154Meganium.png', 'https://cdn.bulbagarden.net/upload/9/9b/155Cyndaquil.png', 'https://cdn.bulbagarden.net/upload/b/b6/156Quilava.png', 'https://cdn.bulbagarden.net/upload/4/47/157Typhlosion.png', 'https://cdn.bulbagarden.net/upload/d/df/158Totodile.png', 'https://cdn.bulbagarden.net/upload/a/a5/159Croconaw.png', 'https://cdn.bulbagarden.net/upload/d/d5/160Feraligatr.png', 'https://cdn.bulbagarden.net/upload/c/c5/161Sentret.png', 'https://cdn.bulbagarden.net/upload/4/4b/162Furret.png', 'https://cdn.bulbagarden.net/upload/5/53/163Hoothoot.png', 'https://cdn.bulbagarden.net/upload/f/fa/164Noctowl.png', 'https://cdn.bulbagarden.net/upload/b/bb/165Ledyba.png', 'https://cdn.bulbagarden.net/upload/5/5b/166Ledian.png', 'https://cdn.bulbagarden.net/upload/7/75/167Spinarak.png', 'https://cdn.bulbagarden.net/upload/7/76/168Ariados.png', 'https://cdn.bulbagarden.net/upload/1/17/169Crobat.png', 'https://cdn.bulbagarden.net/upload/d/d9/170Chinchou.png', 'https://cdn.bulbagarden.net/upload/9/9b/171Lanturn.png', 'https://cdn.bulbagarden.net/upload/b/b9/172Pichu.png', 'https://cdn.bulbagarden.net/upload/e/e4/173Cleffa.png', 'https://cdn.bulbagarden.net/upload/4/4d/174Igglybuff.png', 'https://cdn.bulbagarden.net/upload/6/6b/175Togepi.png', 'https://cdn.bulbagarden.net/upload/1/11/176Togetic.png', 'https://cdn.bulbagarden.net/upload/5/5b/177Natu.png', 'https://cdn.bulbagarden.net/upload/f/f4/178Xatu.png', 'https://cdn.bulbagarden.net/upload/6/6b/179Mareep.png', 'https://cdn.bulbagarden.net/upload/6/6f/180Flaaffy.png', 'https://cdn.bulbagarden.net/upload/4/47/181Ampharos.png', 'https://cdn.bulbagarden.net/upload/c/cd/182Bellossom.png', 'https://cdn.bulbagarden.net/upload/4/42/183Marill.png', 'https://cdn.bulbagarden.net/upload/a/a5/184Azumarill.png', 'https://cdn.bulbagarden.net/upload/1/1e/185Sudowoodo.png', 'https://cdn.bulbagarden.net/upload/a/a4/186Politoed.png', 'https://cdn.bulbagarden.net/upload/f/f8/187Hoppip.png', 'https://cdn.bulbagarden.net/upload/4/4f/188Skiploom.png', 'https://cdn.bulbagarden.net/upload/5/5e/189Jumpluff.png', 'https://cdn.bulbagarden.net/upload/4/42/190Aipom.png', 'https://cdn.bulbagarden.net/upload/9/95/191Sunkern.png', 'https://cdn.bulbagarden.net/upload/9/98/192Sunflora.png', 'https://cdn.bulbagarden.net/upload/d/dd/193Yanma.png', 'https://cdn.bulbagarden.net/upload/7/78/194Wooper.png', 'https://cdn.bulbagarden.net/upload/a/a4/195Quagsire.png', 'https://cdn.bulbagarden.net/upload/a/a7/196Espeon.png', 'https://cdn.bulbagarden.net/upload/3/3d/197Umbreon.png', 'https://cdn.bulbagarden.net/upload/3/33/198Murkrow.png', 'https://cdn.bulbagarden.net/upload/e/e1/199Slowking.png', 'https://cdn.bulbagarden.net/upload/b/be/200Misdreavus.png', 'https://cdn.bulbagarden.net/upload/7/77/201Unown.png', 'https://cdn.bulbagarden.net/upload/1/17/202Wobbuffet.png', 'https://cdn.bulbagarden.net/upload/1/11/203Girafarig.png', 'https://cdn.bulbagarden.net/upload/0/0b/204Pineco.png', 'https://cdn.bulbagarden.net/upload/6/68/205Forretress.png', 'https://cdn.bulbagarden.net/upload/2/20/206Dunsparce.png', 'https://cdn.bulbagarden.net/upload/0/04/207Gligar.png', 'https://cdn.bulbagarden.net/upload/b/ba/208Steelix.png', 'https://cdn.bulbagarden.net/upload/7/7f/209Snubbull.png', 'https://cdn.bulbagarden.net/upload/b/b1/210Granbull.png', 'https://cdn.bulbagarden.net/upload/2/21/211Qwilfish.png', 'https://cdn.bulbagarden.net/upload/5/55/212Scizor.png', 'https://cdn.bulbagarden.net/upload/c/c7/213Shuckle.png', 'https://cdn.bulbagarden.net/upload/4/47/214Heracross.png', 'https://cdn.bulbagarden.net/upload/7/71/215Sneasel.png', 'https://cdn.bulbagarden.net/upload/e/e9/216Teddiursa.png', 'https://cdn.bulbagarden.net/upload/e/e9/217Ursaring.png', 'https://cdn.bulbagarden.net/upload/6/68/218Slugma.png', 'https://cdn.bulbagarden.net/upload/6/65/219Magcargo.png', 'https://cdn.bulbagarden.net/upload/b/b5/220Swinub.png', 'https://cdn.bulbagarden.net/upload/4/49/221Piloswine.png', 'https://cdn.bulbagarden.net/upload/f/fc/222Corsola.png', 'https://cdn.bulbagarden.net/upload/9/95/223Remoraid.png', 'https://cdn.bulbagarden.net/upload/c/cb/224Octillery.png', 'https://cdn.bulbagarden.net/upload/3/3f/225Delibird.png', 'https://cdn.bulbagarden.net/upload/c/c5/226Mantine.png', 'https://cdn.bulbagarden.net/upload/3/35/227Skarmory.png', 'https://cdn.bulbagarden.net/upload/5/53/228Houndour.png', 'https://cdn.bulbagarden.net/upload/5/51/229Houndoom.png', 'https://cdn.bulbagarden.net/upload/3/3c/230Kingdra.png', 'https://cdn.bulbagarden.net/upload/d/d3/231Phanpy.png', 'https://cdn.bulbagarden.net/upload/5/53/232Donphan.png', 'https://cdn.bulbagarden.net/upload/9/99/233Porygon2.png', 'https://cdn.bulbagarden.net/upload/5/50/234Stantler.png', 'https://cdn.bulbagarden.net/upload/9/92/235Smeargle.png', 'https://cdn.bulbagarden.net/upload/c/c7/236Tyrogue.png', 'https://cdn.bulbagarden.net/upload/9/94/237Hitmontop.png', 'https://cdn.bulbagarden.net/upload/0/0e/238Smoochum.png', 'https://cdn.bulbagarden.net/upload/5/5d/239Elekid.png', 'https://cdn.bulbagarden.net/upload/c/cb/240Magby.png', 'https://cdn.bulbagarden.net/upload/1/13/241Miltank.png', 'https://cdn.bulbagarden.net/upload/5/56/242Blissey.png', 'https://cdn.bulbagarden.net/upload/c/c1/243Raikou.png', 'https://cdn.bulbagarden.net/upload/f/f9/244Entei.png', 'https://cdn.bulbagarden.net/upload/d/da/245Suicune.png', 'https://cdn.bulbagarden.net/upload/7/70/246Larvitar.png', 'https://cdn.bulbagarden.net/upload/a/a1/247Pupitar.png', 'https://cdn.bulbagarden.net/upload/8/82/248Tyranitar.png', 'https://cdn.bulbagarden.net/upload/4/44/249Lugia.png', 'https://cdn.bulbagarden.net/upload/6/67/250Ho-Oh.png', 'https://cdn.bulbagarden.net/upload/e/e7/251Celebi.png', 'https://cdn.bulbagarden.net/upload/2/2c/252Treecko.png', 'https://cdn.bulbagarden.net/upload/e/ea/253Grovyle.png', 'https://cdn.bulbagarden.net/upload/3/3e/254Sceptile.png', 'https://cdn.bulbagarden.net/upload/9/91/255Torchic.png', 'https://cdn.bulbagarden.net/upload/2/29/256Combusken.png', 'https://cdn.bulbagarden.net/upload/9/90/257Blaziken.png', 'https://cdn.bulbagarden.net/upload/6/60/258Mudkip.png', 'https://cdn.bulbagarden.net/upload/2/27/259Marshtomp.png', 'https://cdn.bulbagarden.net/upload/b/b6/260Swampert.png', 'https://cdn.bulbagarden.net/upload/f/fc/261Poochyena.png', 'https://cdn.bulbagarden.net/upload/f/f1/262Mightyena.png', 'https://cdn.bulbagarden.net/upload/4/47/263Zigzagoon.png', 'https://cdn.bulbagarden.net/upload/f/f7/264Linoone.png', 'https://cdn.bulbagarden.net/upload/7/76/265Wurmple.png', 'https://cdn.bulbagarden.net/upload/e/ef/266Silcoon.png', 'https://cdn.bulbagarden.net/upload/4/4c/267Beautifly.png', 'https://cdn.bulbagarden.net/upload/a/a3/268Cascoon.png', 'https://cdn.bulbagarden.net/upload/3/34/269Dustox.png', 'https://cdn.bulbagarden.net/upload/e/ee/270Lotad.png', 'https://cdn.bulbagarden.net/upload/8/8b/271Lombre.png', 'https://cdn.bulbagarden.net/upload/f/ff/272Ludicolo.png', 'https://cdn.bulbagarden.net/upload/8/84/273Seedot.png', 'https://cdn.bulbagarden.net/upload/0/07/274Nuzleaf.png', 'https://cdn.bulbagarden.net/upload/f/f7/275Shiftry.png', 'https://cdn.bulbagarden.net/upload/e/e4/276Taillow.png', 'https://cdn.bulbagarden.net/upload/4/45/277Swellow.png', 'https://cdn.bulbagarden.net/upload/3/39/278Wingull.png', 'https://cdn.bulbagarden.net/upload/f/f2/279Pelipper.png', 'https://cdn.bulbagarden.net/upload/e/e1/280Ralts.png', 'https://cdn.bulbagarden.net/upload/0/00/281Kirlia.png', 'https://cdn.bulbagarden.net/upload/9/99/282Gardevoir.png', 'https://cdn.bulbagarden.net/upload/f/f6/283Surskit.png', 'https://cdn.bulbagarden.net/upload/0/0a/284Masquerain.png', 'https://cdn.bulbagarden.net/upload/d/d8/285Shroomish.png', 'https://cdn.bulbagarden.net/upload/d/de/286Breloom.png', 'https://cdn.bulbagarden.net/upload/d/d2/287Slakoth.png', 'https://cdn.bulbagarden.net/upload/6/61/288Vigoroth.png', 'https://cdn.bulbagarden.net/upload/7/71/289Slaking.png', 'https://cdn.bulbagarden.net/upload/9/90/290Nincada.png', 'https://cdn.bulbagarden.net/upload/7/76/291Ninjask.png', 'https://cdn.bulbagarden.net/upload/5/59/292Shedinja.png', 'https://cdn.bulbagarden.net/upload/6/6c/293Whismur.png', 'https://cdn.bulbagarden.net/upload/1/12/294Loudred.png', 'https://cdn.bulbagarden.net/upload/1/12/295Exploud.png', 'https://cdn.bulbagarden.net/upload/b/b6/296Makuhita.png', 'https://cdn.bulbagarden.net/upload/6/6f/297Hariyama.png', 'https://cdn.bulbagarden.net/upload/a/ac/298Azurill.png', 'https://cdn.bulbagarden.net/upload/8/89/299Nosepass.png', 'https://cdn.bulbagarden.net/upload/8/8a/300Skitty.png', 'https://cdn.bulbagarden.net/upload/f/f4/301Delcatty.png', 'https://cdn.bulbagarden.net/upload/d/d3/302Sableye.png', 'https://cdn.bulbagarden.net/upload/c/c0/303Mawile.png', 'https://cdn.bulbagarden.net/upload/b/bb/304Aron.png', 'https://cdn.bulbagarden.net/upload/b/bf/305Lairon.png', 'https://cdn.bulbagarden.net/upload/6/6d/306Aggron.png', 'https://cdn.bulbagarden.net/upload/7/71/307Meditite.png', 'https://cdn.bulbagarden.net/upload/0/05/308Medicham.png', 'https://cdn.bulbagarden.net/upload/4/47/309Electrike.png', 'https://cdn.bulbagarden.net/upload/b/bb/310Manectric.png', 'https://cdn.bulbagarden.net/upload/a/a3/311Plusle.png', 'https://cdn.bulbagarden.net/upload/e/e7/312Minun.png', 'https://cdn.bulbagarden.net/upload/d/d6/313Volbeat.png', 'https://cdn.bulbagarden.net/upload/5/55/314Illumise.png', 'https://cdn.bulbagarden.net/upload/f/f1/315Roselia.png', 'https://cdn.bulbagarden.net/upload/f/f0/316Gulpin.png', 'https://cdn.bulbagarden.net/upload/a/ad/317Swalot.png', 'https://cdn.bulbagarden.net/upload/9/98/318Carvanha.png', 'https://cdn.bulbagarden.net/upload/a/a8/319Sharpedo.png', 'https://cdn.bulbagarden.net/upload/7/71/320Wailmer.png', 'https://cdn.bulbagarden.net/upload/b/b9/321Wailord.png', 'https://cdn.bulbagarden.net/upload/c/c6/322Numel.png', 'https://cdn.bulbagarden.net/upload/7/7d/323Camerupt.png', 'https://cdn.bulbagarden.net/upload/3/3b/324Torkoal.png', 'https://cdn.bulbagarden.net/upload/9/9e/325Spoink.png', 'https://cdn.bulbagarden.net/upload/5/54/326Grumpig.png', 'https://cdn.bulbagarden.net/upload/8/8f/327Spinda.png', 'https://cdn.bulbagarden.net/upload/7/76/328Trapinch.png', 'https://cdn.bulbagarden.net/upload/a/af/329Vibrava.png', 'https://cdn.bulbagarden.net/upload/f/f1/330Flygon.png', 'https://cdn.bulbagarden.net/upload/1/12/331Cacnea.png', 'https://cdn.bulbagarden.net/upload/4/41/332Cacturne.png', 'https://cdn.bulbagarden.net/upload/9/99/333Swablu.png', 'https://cdn.bulbagarden.net/upload/d/da/334Altaria.png', 'https://cdn.bulbagarden.net/upload/d/d3/335Zangoose.png', 'https://cdn.bulbagarden.net/upload/d/d6/336Seviper.png', 'https://cdn.bulbagarden.net/upload/e/eb/337Lunatone.png', 'https://cdn.bulbagarden.net/upload/9/90/338Solrock.png', 'https://cdn.bulbagarden.net/upload/6/60/339Barboach.png', 'https://cdn.bulbagarden.net/upload/6/60/340Whiscash.png', 'https://cdn.bulbagarden.net/upload/3/3d/341Corphish.png', 'https://cdn.bulbagarden.net/upload/f/f4/342Crawdaunt.png', 'https://cdn.bulbagarden.net/upload/8/8b/343Baltoy.png', 'https://cdn.bulbagarden.net/upload/0/07/344Claydol.png', 'https://cdn.bulbagarden.net/upload/3/34/345Lileep.png', 'https://cdn.bulbagarden.net/upload/3/38/346Cradily.png', 'https://cdn.bulbagarden.net/upload/4/45/347Anorith.png', 'https://cdn.bulbagarden.net/upload/1/1d/348Armaldo.png', 'https://cdn.bulbagarden.net/upload/4/4b/349Feebas.png', 'https://cdn.bulbagarden.net/upload/3/36/350Milotic.png', 'https://cdn.bulbagarden.net/upload/f/f3/351Castform.png', 'https://cdn.bulbagarden.net/upload/5/50/352Kecleon.png', 'https://cdn.bulbagarden.net/upload/4/4b/353Shuppet.png', 'https://cdn.bulbagarden.net/upload/0/0a/354Banette.png', 'https://cdn.bulbagarden.net/upload/e/e2/355Duskull.png', 'https://cdn.bulbagarden.net/upload/1/12/356Dusclops.png', 'https://cdn.bulbagarden.net/upload/d/dd/357Tropius.png', 'https://cdn.bulbagarden.net/upload/e/e5/358Chimecho.png', 'https://cdn.bulbagarden.net/upload/0/00/359Absol.png', 'https://cdn.bulbagarden.net/upload/d/d0/360Wynaut.png', 'https://cdn.bulbagarden.net/upload/6/6b/361Snorunt.png', 'https://cdn.bulbagarden.net/upload/6/62/362Glalie.png', 'https://cdn.bulbagarden.net/upload/9/9f/363Spheal.png', 'https://cdn.bulbagarden.net/upload/f/f6/364Sealeo.png', 'https://cdn.bulbagarden.net/upload/6/61/365Walrein.png', 'https://cdn.bulbagarden.net/upload/1/11/366Clamperl.png', 'https://cdn.bulbagarden.net/upload/1/11/367Huntail.png', 'https://cdn.bulbagarden.net/upload/3/37/368Gorebyss.png', 'https://cdn.bulbagarden.net/upload/7/78/369Relicanth.png', 'https://cdn.bulbagarden.net/upload/1/1d/370Luvdisc.png', 'https://cdn.bulbagarden.net/upload/d/d2/371Bagon.png', 'https://cdn.bulbagarden.net/upload/a/a5/372Shelgon.png', 'https://cdn.bulbagarden.net/upload/4/41/373Salamence.png', 'https://cdn.bulbagarden.net/upload/d/d4/374Beldum.png', 'https://cdn.bulbagarden.net/upload/6/62/375Metang.png', 'https://cdn.bulbagarden.net/upload/0/05/376Metagross.png', 'https://cdn.bulbagarden.net/upload/a/aa/377Regirock.png', 'https://cdn.bulbagarden.net/upload/f/fe/378Regice.png', 'https://cdn.bulbagarden.net/upload/2/22/379Registeel.png', 'https://cdn.bulbagarden.net/upload/2/24/380Latias.png', 'https://cdn.bulbagarden.net/upload/5/52/381Latios.png', 'https://cdn.bulbagarden.net/upload/4/41/382Kyogre.png', 'https://cdn.bulbagarden.net/upload/7/70/383Groudon.png', 'https://cdn.bulbagarden.net/upload/e/e4/384Rayquaza.png', 'https://cdn.bulbagarden.net/upload/8/85/385Jirachi.png', 'https://cdn.bulbagarden.net/upload/e/e7/386Deoxys.png', 'https://cdn.bulbagarden.net/upload/5/5c/387Turtwig.png', 'https://cdn.bulbagarden.net/upload/5/53/388Grotle.png', 'https://cdn.bulbagarden.net/upload/d/df/389Torterra.png', 'https://cdn.bulbagarden.net/upload/7/76/390Chimchar.png', 'https://cdn.bulbagarden.net/upload/2/2e/391Monferno.png', 'https://cdn.bulbagarden.net/upload/f/fb/392Infernape.png', 'https://cdn.bulbagarden.net/upload/b/b1/393Piplup.png', 'https://cdn.bulbagarden.net/upload/d/df/394Prinplup.png', 'https://cdn.bulbagarden.net/upload/7/7f/395Empoleon.png', 'https://cdn.bulbagarden.net/upload/a/af/396Starly.png', 'https://cdn.bulbagarden.net/upload/f/f8/397Staravia.png', 'https://cdn.bulbagarden.net/upload/5/5e/398Staraptor.png', 'https://cdn.bulbagarden.net/upload/f/f5/399Bidoof.png', 'https://cdn.bulbagarden.net/upload/9/91/400Bibarel.png', 'https://cdn.bulbagarden.net/upload/3/33/401Kricketot.png', 'https://cdn.bulbagarden.net/upload/e/e5/402Kricketune.png', 'https://cdn.bulbagarden.net/upload/3/32/403Shinx.png', 'https://cdn.bulbagarden.net/upload/4/49/404Luxio.png', 'https://cdn.bulbagarden.net/upload/a/a7/405Luxray.png', 'https://cdn.bulbagarden.net/upload/d/d3/406Budew.png', 'https://cdn.bulbagarden.net/upload/0/05/407Roserade.png', 'https://cdn.bulbagarden.net/upload/c/cd/408Cranidos.png', 'https://cdn.bulbagarden.net/upload/8/8a/409Rampardos.png', 'https://cdn.bulbagarden.net/upload/e/e2/410Shieldon.png', 'https://cdn.bulbagarden.net/upload/b/bc/411Bastiodon.png', 'https://cdn.bulbagarden.net/upload/e/e1/412Burmy.png', 'https://cdn.bulbagarden.net/upload/b/b3/413Wormadam.png', 'https://cdn.bulbagarden.net/upload/1/18/414Mothim.png', 'https://cdn.bulbagarden.net/upload/b/b6/415Combee.png', 'https://cdn.bulbagarden.net/upload/2/2c/416Vespiquen.png', 'https://cdn.bulbagarden.net/upload/f/f4/417Pachirisu.png', 'https://cdn.bulbagarden.net/upload/8/83/418Buizel.png', 'https://cdn.bulbagarden.net/upload/b/bf/419Floatzel.png', 'https://cdn.bulbagarden.net/upload/a/a7/420Cherubi.png', 'https://cdn.bulbagarden.net/upload/2/25/421Cherrim-Overcast.png', 'https://cdn.bulbagarden.net/upload/7/72/422Shellos.png', 'https://cdn.bulbagarden.net/upload/1/18/423Gastrodon.png', 'https://cdn.bulbagarden.net/upload/8/86/424Ambipom.png', 'https://cdn.bulbagarden.net/upload/e/eb/425Drifloon.png', 'https://cdn.bulbagarden.net/upload/7/71/426Drifblim.png', 'https://cdn.bulbagarden.net/upload/a/a7/427Buneary.png', 'https://cdn.bulbagarden.net/upload/c/c9/428Lopunny.png', 'https://cdn.bulbagarden.net/upload/b/b4/429Mismagius.png', 'https://cdn.bulbagarden.net/upload/4/46/430Honchkrow.png', 'https://cdn.bulbagarden.net/upload/2/26/431Glameow.png', 'https://cdn.bulbagarden.net/upload/8/80/432Purugly.png', 'https://cdn.bulbagarden.net/upload/e/ed/433Chingling.png', 'https://cdn.bulbagarden.net/upload/7/75/434Stunky.png', 'https://cdn.bulbagarden.net/upload/b/bc/435Skuntank.png', 'https://cdn.bulbagarden.net/upload/c/c1/436Bronzor.png', 'https://cdn.bulbagarden.net/upload/a/aa/437Bronzong.png', 'https://cdn.bulbagarden.net/upload/e/e2/438Bonsly.png', 'https://cdn.bulbagarden.net/upload/3/37/439Mime_Jr.png', 'https://cdn.bulbagarden.net/upload/2/27/440Happiny.png', 'https://cdn.bulbagarden.net/upload/b/bf/441Chatot.png', 'https://cdn.bulbagarden.net/upload/8/8e/442Spiritomb.png', 'https://cdn.bulbagarden.net/upload/6/68/443Gible.png', 'https://cdn.bulbagarden.net/upload/9/9d/444Gabite.png', 'https://cdn.bulbagarden.net/upload/f/fa/445Garchomp.png', 'https://cdn.bulbagarden.net/upload/b/b2/446Munchlax.png', 'https://cdn.bulbagarden.net/upload/a/a2/447Riolu.png', 'https://cdn.bulbagarden.net/upload/d/d7/448Lucario.png', 'https://cdn.bulbagarden.net/upload/a/ab/449Hippopotas.png', 'https://cdn.bulbagarden.net/upload/5/5f/450Hippowdon.png', 'https://cdn.bulbagarden.net/upload/4/47/451Skorupi.png', 'https://cdn.bulbagarden.net/upload/1/13/452Drapion.png', 'https://cdn.bulbagarden.net/upload/f/fa/453Croagunk.png', 'https://cdn.bulbagarden.net/upload/8/8b/454Toxicroak.png', 'https://cdn.bulbagarden.net/upload/d/df/455Carnivine.png', 'https://cdn.bulbagarden.net/upload/4/45/456Finneon.png', 'https://cdn.bulbagarden.net/upload/f/f0/457Lumineon.png', 'https://cdn.bulbagarden.net/upload/b/bc/458Mantyke.png', 'https://cdn.bulbagarden.net/upload/d/d2/459Snover.png', 'https://cdn.bulbagarden.net/upload/3/3b/460Abomasnow.png', 'https://cdn.bulbagarden.net/upload/d/d2/461Weavile.png', 'https://cdn.bulbagarden.net/upload/5/53/462Magnezone.png', 'https://cdn.bulbagarden.net/upload/8/8e/463Lickilicky.png', 'https://cdn.bulbagarden.net/upload/d/d9/464Rhyperior.png', 'https://cdn.bulbagarden.net/upload/3/32/465Tangrowth.png', 'https://cdn.bulbagarden.net/upload/2/23/466Electivire.png', 'https://cdn.bulbagarden.net/upload/6/60/467Magmortar.png', 'https://cdn.bulbagarden.net/upload/8/87/468Togekiss.png', 'https://cdn.bulbagarden.net/upload/e/e6/469Yanmega.png', 'https://cdn.bulbagarden.net/upload/f/f5/470Leafeon.png', 'https://cdn.bulbagarden.net/upload/2/23/471Glaceon.png', 'https://cdn.bulbagarden.net/upload/a/ac/472Gliscor.png', 'https://cdn.bulbagarden.net/upload/d/d0/473Mamoswine.png', 'https://cdn.bulbagarden.net/upload/2/24/474Porygon-Z.png', 'https://cdn.bulbagarden.net/upload/5/58/475Gallade.png', 'https://cdn.bulbagarden.net/upload/a/a6/476Probopass.png', 'https://cdn.bulbagarden.net/upload/4/4f/477Dusknoir.png', 'https://cdn.bulbagarden.net/upload/a/a2/478Froslass.png', 'https://cdn.bulbagarden.net/upload/c/c5/479Rotom.png', 'https://cdn.bulbagarden.net/upload/e/ef/480Uxie.png', 'https://cdn.bulbagarden.net/upload/4/40/481Mesprit.png', 'https://cdn.bulbagarden.net/upload/d/d0/482Azelf.png', 'https://cdn.bulbagarden.net/upload/8/8a/483Dialga.png', 'https://cdn.bulbagarden.net/upload/6/66/484Palkia.png', 'https://cdn.bulbagarden.net/upload/b/b7/485Heatran.png', 'https://cdn.bulbagarden.net/upload/a/a1/486Regigigas.png', 'https://cdn.bulbagarden.net/upload/c/c5/487Giratina-Altered.png', 'https://cdn.bulbagarden.net/upload/4/4a/488Cresselia.png', 'https://cdn.bulbagarden.net/upload/7/72/489Phione.png', 'https://cdn.bulbagarden.net/upload/2/2e/490Manaphy.png', 'https://cdn.bulbagarden.net/upload/6/6d/491Darkrai.png', 'https://cdn.bulbagarden.net/upload/0/05/492Shaymin-Land.png', 'https://cdn.bulbagarden.net/upload/f/fc/493Arceus.png', 'https://cdn.bulbagarden.net/upload/6/60/494Victini.png', 'https://cdn.bulbagarden.net/upload/7/75/495Snivy.png', 'https://cdn.bulbagarden.net/upload/7/73/496Servine.png', 'https://cdn.bulbagarden.net/upload/b/b7/497Serperior.png', 'https://cdn.bulbagarden.net/upload/5/5b/498Tepig.png', 'https://cdn.bulbagarden.net/upload/e/e8/499Pignite.png', 'https://cdn.bulbagarden.net/upload/1/18/500Emboar.png', 'https://cdn.bulbagarden.net/upload/3/3b/501Oshawott.png', 'https://cdn.bulbagarden.net/upload/e/e4/502Dewott.png', 'https://cdn.bulbagarden.net/upload/b/b5/503Samurott.png', 'https://cdn.bulbagarden.net/upload/c/cb/504Patrat.png', 'https://cdn.bulbagarden.net/upload/3/3e/505Watchog.png', 'https://cdn.bulbagarden.net/upload/7/7e/506Lillipup.png', 'https://cdn.bulbagarden.net/upload/9/96/507Herdier.png', 'https://cdn.bulbagarden.net/upload/3/3e/508Stoutland.png', 'https://cdn.bulbagarden.net/upload/4/46/509Purrloin.png', 'https://cdn.bulbagarden.net/upload/0/09/510Liepard.png', 'https://cdn.bulbagarden.net/upload/6/6b/511Pansage.png', 'https://cdn.bulbagarden.net/upload/2/24/512Simisage.png', 'https://cdn.bulbagarden.net/upload/e/e1/513Pansear.png', 'https://cdn.bulbagarden.net/upload/7/7c/514Simisear.png', 'https://cdn.bulbagarden.net/upload/2/2f/515Panpour.png', 'https://cdn.bulbagarden.net/upload/8/83/516Simipour.png', 'https://cdn.bulbagarden.net/upload/6/61/517Munna.png', 'https://cdn.bulbagarden.net/upload/2/2d/518Musharna.png', 'https://cdn.bulbagarden.net/upload/c/c3/519Pidove.png', 'https://cdn.bulbagarden.net/upload/a/a3/520Tranquill.png', 'https://cdn.bulbagarden.net/upload/d/d0/521Unfezant.png', 'https://cdn.bulbagarden.net/upload/a/af/522Blitzle.png', 'https://cdn.bulbagarden.net/upload/a/a1/523Zebstrika.png', 'https://cdn.bulbagarden.net/upload/6/69/524Roggenrola.png', 'https://cdn.bulbagarden.net/upload/c/ce/525Boldore.png', 'https://cdn.bulbagarden.net/upload/5/59/526Gigalith.png', 'https://cdn.bulbagarden.net/upload/3/36/527Woobat.png', 'https://cdn.bulbagarden.net/upload/9/9d/528Swoobat.png', 'https://cdn.bulbagarden.net/upload/c/cf/529Drilbur.png', 'https://cdn.bulbagarden.net/upload/6/63/530Excadrill.png', 'https://cdn.bulbagarden.net/upload/f/f5/531Audino.png', 'https://cdn.bulbagarden.net/upload/6/69/532Timburr.png', 'https://cdn.bulbagarden.net/upload/a/ad/533Gurdurr.png', 'https://cdn.bulbagarden.net/upload/1/11/534Conkeldurr.png', 'https://cdn.bulbagarden.net/upload/c/c9/535Tympole.png', 'https://cdn.bulbagarden.net/upload/c/c9/536Palpitoad.png', 'https://cdn.bulbagarden.net/upload/3/35/537Seismitoad.png', 'https://cdn.bulbagarden.net/upload/7/74/538Throh.png', 'https://cdn.bulbagarden.net/upload/a/a8/539Sawk.png', 'https://cdn.bulbagarden.net/upload/4/4a/540Sewaddle.png', 'https://cdn.bulbagarden.net/upload/2/2b/541Swadloon.png', 'https://cdn.bulbagarden.net/upload/8/8e/542Leavanny.png', 'https://cdn.bulbagarden.net/upload/0/0e/543Venipede.png', 'https://cdn.bulbagarden.net/upload/b/bc/544Whirlipede.png', 'https://cdn.bulbagarden.net/upload/c/cb/545Scolipede.png', 'https://cdn.bulbagarden.net/upload/4/44/546Cottonee.png', 'https://cdn.bulbagarden.net/upload/a/a2/547Whimsicott.png', 'https://cdn.bulbagarden.net/upload/0/0b/548Petilil.png', 'https://cdn.bulbagarden.net/upload/2/21/549Lilligant.png', 'https://cdn.bulbagarden.net/upload/2/2f/550Basculin.png', 'https://cdn.bulbagarden.net/upload/2/26/551Sandile.png', 'https://cdn.bulbagarden.net/upload/d/d4/552Krokorok.png', 'https://cdn.bulbagarden.net/upload/e/e5/553Krookodile.png', 'https://cdn.bulbagarden.net/upload/4/4c/554Darumaka.png', 'https://cdn.bulbagarden.net/upload/4/40/555Darmanitan.png', 'https://cdn.bulbagarden.net/upload/3/35/556Maractus.png', 'https://cdn.bulbagarden.net/upload/6/6b/557Dwebble.png', 'https://cdn.bulbagarden.net/upload/1/19/558Crustle.png', 'https://cdn.bulbagarden.net/upload/d/dc/559Scraggy.png', 'https://cdn.bulbagarden.net/upload/e/e8/560Scrafty.png', 'https://cdn.bulbagarden.net/upload/6/67/561Sigilyph.png', 'https://cdn.bulbagarden.net/upload/a/a4/562Yamask.png', 'https://cdn.bulbagarden.net/upload/f/f8/563Cofagrigus.png', 'https://cdn.bulbagarden.net/upload/1/1a/564Tirtouga.png', 'https://cdn.bulbagarden.net/upload/d/d0/565Carracosta.png', 'https://cdn.bulbagarden.net/upload/a/a3/566Archen.png', 'https://cdn.bulbagarden.net/upload/1/14/567Archeops.png', 'https://cdn.bulbagarden.net/upload/e/e2/568Trubbish.png', 'https://cdn.bulbagarden.net/upload/c/c4/569Garbodor.png', 'https://cdn.bulbagarden.net/upload/2/2b/570Zorua.png', 'https://cdn.bulbagarden.net/upload/a/a6/571Zoroark.png', 'https://cdn.bulbagarden.net/upload/e/ec/572Minccino.png', 'https://cdn.bulbagarden.net/upload/9/94/573Cinccino.png', 'https://cdn.bulbagarden.net/upload/7/71/574Gothita.png', 'https://cdn.bulbagarden.net/upload/6/67/575Gothorita.png', 'https://cdn.bulbagarden.net/upload/3/38/576Gothitelle.png', 'https://cdn.bulbagarden.net/upload/1/1e/577Solosis.png', 'https://cdn.bulbagarden.net/upload/8/83/578Duosion.png', 'https://cdn.bulbagarden.net/upload/1/19/579Reuniclus.png', 'https://cdn.bulbagarden.net/upload/4/4b/580Ducklett.png', 'https://cdn.bulbagarden.net/upload/7/76/581Swanna.png', 'https://cdn.bulbagarden.net/upload/3/3f/582Vanillite.png', 'https://cdn.bulbagarden.net/upload/2/2f/583Vanillish.png', 'https://cdn.bulbagarden.net/upload/3/39/584Vanilluxe.png', 'https://cdn.bulbagarden.net/upload/6/68/585Deerling-Spring.png', 'https://cdn.bulbagarden.net/upload/8/8d/586Sawsbuck-Spring.png', 'https://cdn.bulbagarden.net/upload/b/b4/587Emolga.png', 'https://cdn.bulbagarden.net/upload/6/60/588Karrablast.png', 'https://cdn.bulbagarden.net/upload/6/63/589Escavalier.png', 'https://cdn.bulbagarden.net/upload/c/cc/590Foongus.png', 'https://cdn.bulbagarden.net/upload/1/13/591Amoonguss.png', 'https://cdn.bulbagarden.net/upload/8/88/592Frillish.png', 'https://cdn.bulbagarden.net/upload/5/5c/593Jellicent.png', 'https://cdn.bulbagarden.net/upload/1/10/594Alomomola.png', 'https://cdn.bulbagarden.net/upload/f/f8/595Joltik.png', 'https://cdn.bulbagarden.net/upload/7/7a/596Galvantula.png', 'https://cdn.bulbagarden.net/upload/2/28/597Ferroseed.png', 'https://cdn.bulbagarden.net/upload/6/6c/598Ferrothorn.png', 'https://cdn.bulbagarden.net/upload/e/ea/599Klink.png', 'https://cdn.bulbagarden.net/upload/8/80/600Klang.png', 'https://cdn.bulbagarden.net/upload/c/cf/601Klinklang.png', 'https://cdn.bulbagarden.net/upload/5/5e/602Tynamo.png', 'https://cdn.bulbagarden.net/upload/c/c7/603Eelektrik.png', 'https://cdn.bulbagarden.net/upload/6/6c/604Eelektross.png', 'https://cdn.bulbagarden.net/upload/f/fd/605Elgyem.png', 'https://cdn.bulbagarden.net/upload/2/2c/606Beheeyem.png', 'https://cdn.bulbagarden.net/upload/8/8e/607Litwick.png', 'https://cdn.bulbagarden.net/upload/a/a5/608Lampent.png', 'https://cdn.bulbagarden.net/upload/6/65/609Chandelure.png', 'https://cdn.bulbagarden.net/upload/5/5c/610Axew.png', 'https://cdn.bulbagarden.net/upload/0/05/611Fraxure.png', 'https://cdn.bulbagarden.net/upload/8/8f/612Haxorus.png', 'https://cdn.bulbagarden.net/upload/7/72/613Cubchoo.png', 'https://cdn.bulbagarden.net/upload/4/40/614Beartic.png', 'https://cdn.bulbagarden.net/upload/1/11/615Cryogonal.png', 'https://cdn.bulbagarden.net/upload/f/f6/616Shelmet.png', 'https://cdn.bulbagarden.net/upload/3/34/617Accelgor.png', 'https://cdn.bulbagarden.net/upload/d/d2/618Stunfisk.png', 'https://cdn.bulbagarden.net/upload/4/41/619Mienfoo.png', 'https://cdn.bulbagarden.net/upload/2/20/620Mienshao.png', 'https://cdn.bulbagarden.net/upload/a/ad/621Druddigon.png', 'https://cdn.bulbagarden.net/upload/a/ac/622Golett.png', 'https://cdn.bulbagarden.net/upload/6/68/623Golurk.png', 'https://cdn.bulbagarden.net/upload/9/9c/624Pawniard.png', 'https://cdn.bulbagarden.net/upload/7/74/625Bisharp.png', 'https://cdn.bulbagarden.net/upload/a/a4/626Bouffalant.png', 'https://cdn.bulbagarden.net/upload/b/bb/627Rufflet.png', 'https://cdn.bulbagarden.net/upload/c/cf/628Braviary.png', 'https://cdn.bulbagarden.net/upload/f/f2/629Vullaby.png', 'https://cdn.bulbagarden.net/upload/0/00/630Mandibuzz.png', 'https://cdn.bulbagarden.net/upload/b/b0/631Heatmor.png', 'https://cdn.bulbagarden.net/upload/1/1a/632Durant.png', 'https://cdn.bulbagarden.net/upload/f/f7/633Deino.png', 'https://cdn.bulbagarden.net/upload/a/a6/634Zweilous.png', 'https://cdn.bulbagarden.net/upload/3/3e/635Hydreigon.png', 'https://cdn.bulbagarden.net/upload/f/f4/636Larvesta.png', 'https://cdn.bulbagarden.net/upload/6/6b/637Volcarona.png', 'https://cdn.bulbagarden.net/upload/6/65/638Cobalion.png', 'https://cdn.bulbagarden.net/upload/a/ad/639Terrakion.png', 'https://cdn.bulbagarden.net/upload/7/79/640Virizion.png', 'https://cdn.bulbagarden.net/upload/0/08/641Tornadus.png', 'https://cdn.bulbagarden.net/upload/b/b8/642Thundurus.png', 'https://cdn.bulbagarden.net/upload/8/8d/643Reshiram.png', 'https://cdn.bulbagarden.net/upload/8/81/644Zekrom.png', 'https://cdn.bulbagarden.net/upload/b/bb/645Landorus.png', 'https://cdn.bulbagarden.net/upload/c/c3/646Kyurem.png', 'https://cdn.bulbagarden.net/upload/5/50/647Keldeo.png', 'https://cdn.bulbagarden.net/upload/a/a3/648Meloetta.png', 'https://cdn.bulbagarden.net/upload/4/46/649Genesect.png', 'https://cdn.bulbagarden.net/upload/c/ca/650Chespin.png', 'https://cdn.bulbagarden.net/upload/7/71/651Quilladin.png', 'https://cdn.bulbagarden.net/upload/1/18/652Chesnaught.png', 'https://cdn.bulbagarden.net/upload/3/3d/653Fennekin.png', 'https://cdn.bulbagarden.net/upload/0/09/654Braixen.png', 'https://cdn.bulbagarden.net/upload/2/21/655Delphox.png', 'https://cdn.bulbagarden.net/upload/1/18/656Froakie.png', 'https://cdn.bulbagarden.net/upload/f/fc/657Frogadier.png', 'https://cdn.bulbagarden.net/upload/6/67/658Greninja.png', 'https://cdn.bulbagarden.net/upload/7/70/659Bunnelby.png', 'https://cdn.bulbagarden.net/upload/3/34/660Diggersby.png', 'https://cdn.bulbagarden.net/upload/7/7e/661Fletchling.png', 'https://cdn.bulbagarden.net/upload/c/ce/662Fletchinder.png', 'https://cdn.bulbagarden.net/upload/a/ae/663Talonflame.png', 'https://cdn.bulbagarden.net/upload/d/d3/664Scatterbug.png', 'https://cdn.bulbagarden.net/upload/b/b7/665Spewpa.png', 'https://cdn.bulbagarden.net/upload/4/4c/666Vivillon.png', 'https://cdn.bulbagarden.net/upload/1/1f/667Litleo.png', 'https://cdn.bulbagarden.net/upload/7/70/668Pyroar.png', 'https://cdn.bulbagarden.net/upload/5/52/669Flab%C3%A9b%C3%A9.png', 'https://cdn.bulbagarden.net/upload/1/17/670Floette.png', 'https://cdn.bulbagarden.net/upload/3/37/671Florges.png', 'https://cdn.bulbagarden.net/upload/5/5d/672Skiddo.png', 'https://cdn.bulbagarden.net/upload/b/bc/673Gogoat.png', 'https://cdn.bulbagarden.net/upload/1/1c/674Pancham.png', 'https://cdn.bulbagarden.net/upload/0/08/675Pangoro.png', 'https://cdn.bulbagarden.net/upload/4/49/676Furfrou.png', 'https://cdn.bulbagarden.net/upload/0/09/677Espurr.png', 'https://cdn.bulbagarden.net/upload/a/a6/678Meowstic.png', 'https://cdn.bulbagarden.net/upload/3/35/679Honedge.png', 'https://cdn.bulbagarden.net/upload/e/ef/680Doublade.png', 'https://cdn.bulbagarden.net/upload/a/ad/681Aegislash.png', 'https://cdn.bulbagarden.net/upload/6/66/682Spritzee.png', 'https://cdn.bulbagarden.net/upload/d/d9/683Aromatisse.png', 'https://cdn.bulbagarden.net/upload/b/bf/684Swirlix.png', 'https://cdn.bulbagarden.net/upload/8/8d/685Slurpuff.png', 'https://cdn.bulbagarden.net/upload/7/70/686Inkay.png', 'https://cdn.bulbagarden.net/upload/e/e4/687Malamar.png', 'https://cdn.bulbagarden.net/upload/5/5b/688Binacle.png', 'https://cdn.bulbagarden.net/upload/4/48/689Barbaracle.png', 'https://cdn.bulbagarden.net/upload/4/4e/690Skrelp.png', 'https://cdn.bulbagarden.net/upload/a/a9/691Dragalge.png', 'https://cdn.bulbagarden.net/upload/f/fb/692Clauncher.png', 'https://cdn.bulbagarden.net/upload/d/d3/693Clawitzer.png', 'https://cdn.bulbagarden.net/upload/5/51/694Helioptile.png', 'https://cdn.bulbagarden.net/upload/f/f6/695Heliolisk.png', 'https://cdn.bulbagarden.net/upload/c/c3/696Tyrunt.png', 'https://cdn.bulbagarden.net/upload/8/8b/697Tyrantrum.png', 'https://cdn.bulbagarden.net/upload/2/2a/698Amaura.png', 'https://cdn.bulbagarden.net/upload/9/9e/699Aurorus.png', 'https://cdn.bulbagarden.net/upload/e/e8/700Sylveon.png', 'https://cdn.bulbagarden.net/upload/4/44/701Hawlucha.png', 'https://cdn.bulbagarden.net/upload/c/c9/702Dedenne.png', 'https://cdn.bulbagarden.net/upload/f/fa/703Carbink.png', 'https://cdn.bulbagarden.net/upload/2/28/704Goomy.png', 'https://cdn.bulbagarden.net/upload/9/95/705Sliggoo.png', 'https://cdn.bulbagarden.net/upload/d/df/706Goodra.png', 'https://cdn.bulbagarden.net/upload/0/04/707Klefki.png', 'https://cdn.bulbagarden.net/upload/7/72/708Phantump.png', 'https://cdn.bulbagarden.net/upload/4/4b/709Trevenant.png', 'https://cdn.bulbagarden.net/upload/d/df/710Pumpkaboo.png', 'https://cdn.bulbagarden.net/upload/8/88/711Gourgeist.png', 'https://cdn.bulbagarden.net/upload/c/c3/712Bergmite.png', 'https://cdn.bulbagarden.net/upload/0/04/713Avalugg.png', 'https://cdn.bulbagarden.net/upload/0/07/714Noibat.png', 'https://cdn.bulbagarden.net/upload/1/15/715Noivern.png', 'https://cdn.bulbagarden.net/upload/1/13/716Xerneas.png', 'https://cdn.bulbagarden.net/upload/5/54/717Yveltal.png', 'https://cdn.bulbagarden.net/upload/3/3a/718Zygarde.png', 'https://cdn.bulbagarden.net/upload/b/b3/719Diancie.png', 'https://cdn.bulbagarden.net/upload/f/fb/720Hoopa.png', 'https://cdn.bulbagarden.net/upload/4/44/721Volcanion.png', 'https://cdn.bulbagarden.net/upload/7/74/722Rowlet.png', 'https://cdn.bulbagarden.net/upload/1/1e/723Dartrix.png', 'https://cdn.bulbagarden.net/upload/a/a4/724Decidueye.png', 'https://cdn.bulbagarden.net/upload/0/0e/725Litten.png', 'https://cdn.bulbagarden.net/upload/d/dc/726Torracat.png', 'https://cdn.bulbagarden.net/upload/2/27/727Incineroar.png', 'https://cdn.bulbagarden.net/upload/d/d8/728Popplio.png', 'https://cdn.bulbagarden.net/upload/c/cd/729Brionne.png', 'https://cdn.bulbagarden.net/upload/8/89/730Primarina.png', 'https://cdn.bulbagarden.net/upload/1/15/731Pikipek.png', 'https://cdn.bulbagarden.net/upload/5/5c/732Trumbeak.png', 'https://cdn.bulbagarden.net/upload/7/78/733Toucannon.png', 'https://cdn.bulbagarden.net/upload/0/08/734Yungoos.png', 'https://cdn.bulbagarden.net/upload/b/ba/735Gumshoos.png', 'https://cdn.bulbagarden.net/upload/1/14/736Grubbin.png', 'https://cdn.bulbagarden.net/upload/e/ec/737Charjabug.png', 'https://cdn.bulbagarden.net/upload/4/4e/738Vikavolt.png', 'https://cdn.bulbagarden.net/upload/9/98/739Crabrawler.png', 'https://cdn.bulbagarden.net/upload/1/17/740Crabominable.png', 'https://cdn.bulbagarden.net/upload/e/ed/741Oricorio-Baile.png', 'https://cdn.bulbagarden.net/upload/f/fa/742Cutiefly.png', 'https://cdn.bulbagarden.net/upload/e/e4/743Ribombee.png', 'https://cdn.bulbagarden.net/upload/5/51/744Rockruff.png', 'https://cdn.bulbagarden.net/upload/1/14/745Lycanroc.png', 'https://cdn.bulbagarden.net/upload/1/18/746Wishiwashi-Solo.png', 'https://cdn.bulbagarden.net/upload/d/d3/747Mareanie.png', 'https://cdn.bulbagarden.net/upload/0/06/748Toxapex.png', 'https://cdn.bulbagarden.net/upload/1/12/749Mudbray.png', 'https://cdn.bulbagarden.net/upload/f/f7/750Mudsdale.png', 'https://cdn.bulbagarden.net/upload/2/29/751Dewpider.png', 'https://cdn.bulbagarden.net/upload/8/82/752Araquanid.png', 'https://cdn.bulbagarden.net/upload/1/10/753Fomantis.png', 'https://cdn.bulbagarden.net/upload/1/19/754Lurantis.png', 'https://cdn.bulbagarden.net/upload/c/c9/755Morelull.png', 'https://cdn.bulbagarden.net/upload/3/36/756Shiinotic.png', 'https://cdn.bulbagarden.net/upload/2/27/757Salandit.png', 'https://cdn.bulbagarden.net/upload/7/72/758Salazzle.png', 'https://cdn.bulbagarden.net/upload/e/e5/759Stufful.png', 'https://cdn.bulbagarden.net/upload/a/a4/760Bewear.png', 'https://cdn.bulbagarden.net/upload/a/a1/761Bounsweet.png', 'https://cdn.bulbagarden.net/upload/7/78/762Steenee.png', 'https://cdn.bulbagarden.net/upload/2/23/763Tsareena.png', 'https://cdn.bulbagarden.net/upload/c/c9/764Comfey.png', 'https://cdn.bulbagarden.net/upload/d/d8/765Oranguru.png', 'https://cdn.bulbagarden.net/upload/b/ba/766Passimian.png', 'https://cdn.bulbagarden.net/upload/e/ef/767Wimpod.png', 'https://cdn.bulbagarden.net/upload/b/b6/768Golisopod.png', 'https://cdn.bulbagarden.net/upload/f/f0/769Sandygast.png', 'https://cdn.bulbagarden.net/upload/3/32/770Palossand.png', 'https://cdn.bulbagarden.net/upload/4/4f/771Pyukumuku.png', 'https://cdn.bulbagarden.net/upload/f/fd/772Type_Null.png', 'https://cdn.bulbagarden.net/upload/b/be/773Silvally.png', 'https://cdn.bulbagarden.net/upload/9/90/774Minior.png', 'https://cdn.bulbagarden.net/upload/7/7d/775Komala.png', 'https://cdn.bulbagarden.net/upload/1/15/776Turtonator.png', 'https://cdn.bulbagarden.net/upload/5/5a/777Togedemaru.png', 'https://cdn.bulbagarden.net/upload/9/9b/778Mimikyu.png', 'https://cdn.bulbagarden.net/upload/9/92/779Bruxish.png', 'https://cdn.bulbagarden.net/upload/d/dc/780Drampa.png', 'https://cdn.bulbagarden.net/upload/2/2f/781Dhelmise.png', 'https://cdn.bulbagarden.net/upload/a/a0/782Jangmo-o.png', 'https://cdn.bulbagarden.net/upload/0/0d/783Hakamo-o.png', 'https://cdn.bulbagarden.net/upload/8/84/784Kommo-o.png', 'https://cdn.bulbagarden.net/upload/d/d0/785Tapu_Koko.png', 'https://cdn.bulbagarden.net/upload/4/4d/786Tapu_Lele.png', 'https://cdn.bulbagarden.net/upload/6/67/787Tapu_Bulu.png', 'https://cdn.bulbagarden.net/upload/6/66/788Tapu_Fini.png', 'https://cdn.bulbagarden.net/upload/1/17/789Cosmog.png', 'https://cdn.bulbagarden.net/upload/1/1b/790Cosmoem.png', 'https://cdn.bulbagarden.net/upload/5/57/791Solgaleo.png', 'https://cdn.bulbagarden.net/upload/9/9d/792Lunala.png', 'https://cdn.bulbagarden.net/upload/2/2c/793Nihilego.png', 'https://cdn.bulbagarden.net/upload/f/fa/794Buzzwole.png', 'https://cdn.bulbagarden.net/upload/c/c7/795Pheromosa.png', 'https://cdn.bulbagarden.net/upload/d/d2/796Xurkitree.png', 'https://cdn.bulbagarden.net/upload/8/89/797Celesteela.png', 'https://cdn.bulbagarden.net/upload/f/fe/798Kartana.png', 'https://cdn.bulbagarden.net/upload/4/47/799Guzzlord.png', 'https://cdn.bulbagarden.net/upload/4/44/800Necrozma.png', 'https://cdn.bulbagarden.net/upload/0/0a/801Magearna.png', 'https://cdn.bulbagarden.net/upload/8/89/802Marshadow.png', 'https://cdn.bulbagarden.net/upload/e/e5/803Poipole.png', 'https://cdn.bulbagarden.net/upload/d/de/804Naganadel.png', 'https://cdn.bulbagarden.net/upload/2/27/805Stakataka.png', 'https://cdn.bulbagarden.net/upload/a/a5/806Blacephalon.png', 'https://cdn.bulbagarden.net/upload/a/a7/807Zeraora.png']
     pepe = modnar.choice(z)
@@ -392,7 +399,7 @@ def savepokemon(ctx):
     bg.save(x)
     return [x, pepe.split('.png')[0].split('/')[-1][3:]]
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["whosthatpokemon"])
 async def wtp(ctx, *args):
     if(args == ()):
         x = savepokemon(ctx)
@@ -423,7 +430,7 @@ async def wtp(ctx, *args):
             else:
                 await ctx.message.channel.send("That's not quite right, try again!")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["shibe", "shiba", "shibainu", "inu"])
 async def shib(ctx):
     x = requests.get('http://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true').text
     url = x.split('"')[1]
@@ -453,7 +460,7 @@ async def kick(ctx, user: discord.User):
         await client.kick(user)
         await ctx.message.channel.send("Kicked " + str(n) + "#" + str(d) + "!")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["song"])
 async def music(ctx, bpm, x):
     os.chdir("C:\\MewBot")
     x = subprocess.check_output(
@@ -474,7 +481,7 @@ async def music(ctx, bpm, x):
         for i in range(m):
             os.remove(ctx.message.author.discriminator + ctx.message.author.name + str(i) + ".wav")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["trans", "googletrans", "googletranslate"])
 async def translate(ctx, lf, lt, *args):
     x = Translator()
     out = x.translate(' '.join(args), src=lf, dest=lt)
@@ -494,7 +501,7 @@ def isNum(x):
     except:
         return False
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["twitchchannel"])
 async def twitch(ctx, *args):
     x = list(args)[0]
     cl = TwitchClient(client_id=open("TWITCH.txt").read())
@@ -538,7 +545,7 @@ async def twitch(ctx, *args):
         emb.set_image(url="https://static-cdn.jtvnw.net/previews-ttv/live_user_" + c.name + "-320x180.jpg?r=223636")
         await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["up"])
 async def uptime(ctx):
     global dtupt
     y = str(datetime.datetime.now() - dtupt).split('.')[0].split(":")
@@ -649,7 +656,7 @@ async def blurple(ctx, *args):
     await ctx.message.channel.send("Here is your Blurplefied image!")
     await ctx.message.channel.send(file=discord.File(open("temp.png", "rb")))
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["shinypokemon", "shiny", "spkmn", "shinypkmn", "spkmon"])
 async def spokemon(ctx, *args):
     pokemon = ' '.join(args)
     if (isNum(pokemon)):
@@ -662,7 +669,7 @@ async def spokemon(ctx, *args):
     await ctx.message.channel.send(file=discord.File(open(str(ctx.message.author.id) + "_" + pokemon + ".gif", "rb")))
     os.remove(str(ctx.message.author.id) + "_" + pokemon.lower() + ".gif")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["pkmn", "pkmon"])
 async def pokemon(ctx, *args):
     pokemon = ' '.join(args)
     if (isNum(pokemon)):
@@ -703,7 +710,7 @@ async def votemute(ctx, user: discord.User):
                 await ctx.message.channel.send("Your Server is not toggled to allow for Vote Muting!")
 
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["togglevotemute"])
 async def tvotemute(ctx):
     if(ctx.message.server.get_member(ctx.message.author.id) == ctx.message.server.owner):
         x = False
@@ -725,7 +732,7 @@ async def tvotemute(ctx):
             with codecs.open("tms.txt", "w", encoding="utf8") as f:
                 f.write(''.join(y))
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["saydelete"])
 async def sayd(ctx, *args):
     x = ' '.join(args)
     await ctx.message.delete()
@@ -736,7 +743,7 @@ async def otter(ctx):
     o = ["https://goo.gl/q9g11B", "https://goo.gl/GKhkV9", "https://goo.gl/YcWLdH", "https://goo.gl/fxGaKW", "https://goo.gl/rRvqvW", "https://goo.gl/FEFi5P", "https://goo.gl/2EnR7P", "https://goo.gl/ZzF7hf", "https://goo.gl/P152Pw", "https://goo.gl/8A5dd2", "https://goo.gl/c4qTVG", "https://goo.gl/cvdkVx", "https://goo.gl/co1Sqv", "https://goo.gl/5Df5sA", "https://goo.gl/LFcmV4", "https://goo.gl/5j6LkW", "https://goo.gl/786Xme", "https://goo.gl/GLdoVf", "https://goo.gl/Z6PCFS", "https://goo.gl/jFnzZg", "https://goo.gl/ctMSFg", "https://goo.gl/PM7GS6", "https://goo.gl/EiYwHS", "https://goo.gl/MZG9Cf", "https://goo.gl/3dRpV4", "https://goo.gl/tqJXxE", "https://goo.gl/CDbqrS", "https://goo.gl/ZZXVaV", "https://goo.gl/QTsNEk", "https://goo.gl/ka5B6h", "https://goo.gl/sEpfXg", "https://goo.gl/z4dVLZ", "https://goo.gl/6ER4Av", "https://goo.gl/66RwD5", "https://goo.gl/bK5QGZ", "https://goo.gl/rsrsxz", "https://goo.gl/gs8BkV", "https://goo.gl/P6ksoT", "https://goo.gl/DCCR5F"]
     await ctx.message.channel.send(str(ctx.message.author.mention) + ", Here is your otter\n" + modnar.choice(o))
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["inv"])
 async def invite(ctx):
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Invite Link", value="https://discordapp.com/api/oauth2/authorize?client_id=280124040046444546&permissions=0&scope=bot")
@@ -821,7 +828,7 @@ async def csgostats(ctx, id):
         await ctx.message.channel.send(embed=emb)
 
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["listservers"])
 async def servers(ctx):
     fin = ""
     if (ctx.message.author.id == 190804082032640000):
@@ -848,7 +855,7 @@ async def info(ctx):
     emb.add_field(name="Library", value="discord.py")
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["stats", "about"])
 async def botinfo(ctx):
     x = 0
     for server in client.guilds:
@@ -864,7 +871,7 @@ async def botinfo(ctx):
     emb.add_field(name="Library", value="discord.py")
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["emoji"])
 async def bigletter(ctx, *args):
     f = list(' '.join(args))
     fin = ""
@@ -878,21 +885,7 @@ async def bigletter(ctx, *args):
     emb.add_field(name="Emoji String", value=fin)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
-async def emoji(ctx, *args):
-    f = list(' '.join(args))
-    fin = ""
-    for i in f:
-        i = i.lower()
-        if(i in list("abcdefghijklmnopqrstuvwxyz")):
-            fin += ":regional_indicator_" + i + ": "
-        else:
-            fin += i
-    emb = (discord.Embed(colour=0xf7b8cf))
-    emb.add_field(name="Emoji String", value=fin)
-    await ctx.message.channel.send(embed=emb)
-
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["deepfry"])
 async def df(ctx, *args):
     try:
         if (args == ()):
@@ -939,7 +932,7 @@ async def df(ctx, *args):
     except:
         await ctx.message.channel.send("Image could not be found!")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["char"])
 async def character(ctx, *args):
     s = list(' '.join(args))
     fin = ""
@@ -950,7 +943,7 @@ async def character(ctx, *args):
         fin = fin + '`\\U000000' + a.lower() + '`: **' + f + '** - ' + i + ' — ' + url + "\n"
     await ctx.message.channel.send(fin)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["prime"])
 async def isprime(ctx, *args):
     s = int(''.join(args))
     emb = (discord.Embed(colour=0xf7b8cf))
@@ -962,21 +955,21 @@ async def isprime(ctx, *args):
         emb.add_field(name="Is " + str(s) + " prime?", value=str(s) + " may be prime.")
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["len"])
 async def length(ctx, *args):
     s = len(list(' '.join(args)))
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Length of String", value=str(s))
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["lower"])
 async def lowercase(ctx, *args):
     s = ' '.join(args).lower()
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Lowercase String", value=s)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["upper"])
 async def uppercase(ctx, *args):
     s = ' '.join(args).upper()
     emb = (discord.Embed(colour=0xf7b8cf))
@@ -1025,21 +1018,21 @@ async def morsee(ctx, *args):
     emb.add_field(name="Morse Encoded String", value=fin)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["hexadecimald", "hexdecode", "hexadecimaldecode"])
 async def hexd(ctx, *args):
     s = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Hex Decoded String", value=base64.b16decode(s.encode('utf-8')).decode())
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["hexadecimale", "hexencode", "hexadecimalencode"])
 async def hexe(ctx, *args):
     s = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Hex Encoded String", value=base64.b16encode(s.encode('utf-8')).decode())
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["levelpass"])
 async def lpass(ctx, *args):
     id = ' '.join(args)
     url = "http://gdidthingpython.000webhostapp.com/thing2.php?id=" + id
@@ -1108,21 +1101,21 @@ async def level(ctx, *args):
             emb.set_thumbnail(url="https://i.imgur.com/jLKq8zv.png")
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["sha512encode"])
 async def sha512e(ctx, *args):
     m = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="SHA512 Hash", value=hashlib.sha512(m.encode('utf-8')).hexdigest())
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["sha256encode"])
 async def sha256e(ctx, *args):
     m = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="SHA256 Hash", value=hashlib.sha256(m.encode('utf-8')).hexdigest())
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["md5encode"])
 async def md5e(ctx, *args):
     m = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
@@ -1164,7 +1157,7 @@ async def top10(ctx):
             count += 1
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["gdprofile", "gdprofiles"])
 async def gdprof(ctx, *args):
     url = "https://gdprofiles.com/" + '-'.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
@@ -1219,7 +1212,7 @@ async def gdprof(ctx, *args):
         emb.add_field(name="404", value="That User hasn't linked their account with GDProfiles!")
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["randomlevel"])
 async def rlevel(ctx):
     fin = ""
     while (True):
@@ -1250,7 +1243,7 @@ async def rlevel(ctx):
     emb.add_field(name="Level Description", value=a)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["randomsong"])
 async def rsong(ctx):
     fin = ""
     while (True):
@@ -1276,7 +1269,7 @@ async def rsong(ctx):
     emb.add_field(name="Genre", value=c)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["gjpdecode", "geometryjumppassworddecode", "geometryjumppasswordd"])
 async def gjpd(ctx, *args):
     s = ' '.join(args)
     s = base64.b64decode(s.encode('utf-8')).decode()
@@ -1296,7 +1289,7 @@ async def gjpd(ctx, *args):
     emb.add_field(name="GJP Decoded String:", value=out)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["gjpencode", "geometryjumppasswordencode", "geometryjumppassworde"])
 async def gjpe(ctx, *args):
     s = ' '.join(args)
     if(len(s) > 5):
@@ -1320,7 +1313,7 @@ async def gjpe(ctx, *args):
     else:
         await ctx.message.channel.send("Input not long enough! *(>=6 characters!)*")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["rtee", "rteencode", "robtopterribleencryptione", "robtopterribleencryptionencode", "robencode"])
 async def robe(ctx, *args):
     s = ' '.join(args)
     s2 = ""
@@ -1343,7 +1336,7 @@ async def robe(ctx, *args):
     else:
         await ctx.message.channel.send("Input not long enough! *(>=6 characters!)*")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["rted", "rtedecode", "robtopterribleencryptiond", "robtopterribleencryptiondecode", "robdecode"])
 async def robd(ctx, *args):
     s = ' '.join(args)
     s = base64.b64decode(s.encode('utf-8')).decode()
@@ -1363,7 +1356,7 @@ async def robd(ctx, *args):
     emb.add_field(name="RTE Decoded String:", value=out)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["mcserver", "minecraftserver"])
 async def server(ctx, host):
     if(":" not in host):
         server = MinecraftServer.lookup(host + ":25565")
@@ -1383,7 +1376,7 @@ async def ifunny(ctx):
     emb.set_image(url=thumbnail)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["ytsearch", "youtubesearch", "youtube"])
 async def ysearch(ctx, *args):
     s = ' '.join(args)
     resp = urllib.request.urlopen('https://www.youtube.com/results?search_query=' + urllib.parse.quote(s))
@@ -1404,7 +1397,7 @@ async def ysearch(ctx, *args):
         emb.add_field(name="Description", value="N/A")
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["exec"])
 async def execute(ctx, c):
     if(ctx.message.author.id == 190804082032640000):
         with codecs.open("thing.py", "w", encoding="utf8") as f:
@@ -1415,14 +1408,14 @@ async def execute(ctx, c):
         await ctx.message.channel.send(embed=emb)
     else:
         await ctx.message.channel.send("You're not allowed.")
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["bine", "binarye", "binencode", "binaryencode"])
 async def binary(ctx, *args):
     s = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Text to Binary", value=''.join([bin(ord(ch))[2:].zfill(8) for ch in s]))
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["bind", "binaryd", "bindecode", "binarydecode"])
 async def unbinary(ctx, *args):
     s = ' '.join(args)
     from textwrap import wrap
@@ -1434,7 +1427,7 @@ async def unbinary(ctx, *args):
     emb.add_field(name="Binary to Text", value=f)
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["a85decode", "ascii85d", "ascii85decode"])
 async def a85d(ctx, *args):
     s = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
@@ -1444,14 +1437,14 @@ async def a85d(ctx, *args):
         emb.add_field(name="Ascii85 Decoded Message", value=base64.a85decode(s.encode()).decode())
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["a85encode", "ascii85e", "ascii85encode"])
 async def a85e(ctx, *args):
     s = ' '.join(args)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.add_field(name="Ascii85 Encoded Message", value=base64.a85encode(s.encode(), adobe=True).decode())
     await ctx.message.channel.send(embed=emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["user"])
 async def userinfo(ctx, user: discord.User):
     try:
         emb = (discord.Embed(colour=0xf7b8cf))
@@ -1480,7 +1473,7 @@ async def userinfo(ctx, user: discord.User):
         await ctx.message.channel.send("Error" + str(sys.exc_info()[0]))
 
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["b64encode", "base64e", "base64encode"])
 async def b64e(ctx, *args):
     m = ' '.join(args)
     m = base64.b64encode(m.encode())
@@ -1488,7 +1481,7 @@ async def b64e(ctx, *args):
     emb.add_field(name="Encoded Base64 String", value=m.decode())
     await ctx.message.channel.send(embed = emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["b64decode", "base64d", "base64decode"])
 async def b64d(ctx, *args):
     m = ' ' .join(args)
     m = base64.b64decode(m.encode())
@@ -1496,7 +1489,7 @@ async def b64d(ctx, *args):
     emb.add_field(name="Decoded Base64 String", value=m.decode())
     await ctx.message.channel.send(embed = emb)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["reverse"])
 async def flip(ctx, *args):
     m = ' '.join(args)
     f = []
@@ -1511,7 +1504,7 @@ async def jeff(ctx, user: discord.User):
     await ctx.message.channel.send(file=discord.File(open("jeff.jpg", "rb"), filename="jeff.jpg"))
     await ctx.message.channel.send(str(user.mention) + ", You just got jeff'd by " + str(ctx.message.author.mention))
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["coin"])
 async def coinflip(ctx):
     p = [1, 2]
     choic = modnar.choice(p)
@@ -1652,44 +1645,44 @@ async def pay(ctx, user: discord.User, amount):
         f.close()
 
 @client.command(pass_context=True)
-async def othermoney(ctx, user: discord.User):
-    f = open("aaa.txt", "r")
-    count = 0
-    for line in f:
-        if(str(user.id) in line):
-            count = line
-    if(count == 0):
-        f.close()
-        f = open("aaa.txt", "a")
-        f.write(str(user.id) + " 0\n")
-        await ctx.message.channel.send(str(user.mention) + " doesn't have an account, so I made one for them!")
+async def money(ctx, *args):
+    if(not args):
+        f = open("aaa.txt", "r")
+        count = 0
+        for line in f:
+            if(str(ctx.message.author.id) in line):
+                count = line
+        if(count == 0):
+            f.close()
+            f = open("aaa.txt", "a")
+            f.write(str(ctx.message.author.id) + " 0\n")
+            await ctx.message.channel.send("You don't have an account, so I made one for you!")
+            f.close()
+        else:
+            f.close()
+            f = open("aaa.txt", "r")
+            x = str(count).split()[1]
+            await ctx.message.channel.send("You have $" + x + "!")
         f.close()
     else:
-        f.close()
         f = open("aaa.txt", "r")
-        x = str(count).split()[1]
-        await ctx.message.channel.send(str(user.mention) + " has $" + x + "!")
-    f.close()
+        count = 0
+        for line in f:
+            if(str(user.id) in line):
+                count = line
+        if(count == 0):
+            f.close()
+            f = open("aaa.txt", "a")
+            f.write(str(user.id) + " 0\n")
+            await ctx.message.channel.send(str(user.mention) + " doesn't have an account, so I made one for them!")
+            f.close()
+        else:
+            f.close()
+            f = open("aaa.txt", "r")
+            x = str(count).split()[1]
+            await ctx.message.channel.send(str(user.mention) + " has $" + x + "!")
+        f.close()
 
-@client.command(pass_context=True)
-async def money(ctx):
-    f = open("aaa.txt", "r")
-    count = 0
-    for line in f:
-        if(str(ctx.message.author.id) in line):
-            count = line
-    if(count == 0):
-        f.close()
-        f = open("aaa.txt", "a")
-        f.write(str(ctx.message.author.id) + " 0\n")
-        await ctx.message.channel.send("You don't have an account, so I made one for you!")
-        f.close()
-    else:
-        f.close()
-        f = open("aaa.txt", "r")
-        x = str(count).split()[1]
-        await ctx.message.channel.send("You have $" + x + "!")
-    f.close()
 
 @client.command(pass_context=True)
 async def help(ctx, *args):
@@ -1794,7 +1787,7 @@ async def ping(ctx):
     embed.add_field(name="{}".format(round((t2 - t1) * 1000)) + ".0 ms", value="{}".format(round(t2 - t1, 3)) + " sec")
     await ctx.message.channel.send(embed=embed)
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["hypixel", "hypixels", "hstats", "hypixelstats"])
 async def hs(ctx, s):
     try:
         fmsg = ""
@@ -1852,7 +1845,7 @@ async def duel(ctx, user: discord.User):
     else:
         await z.edit(content="{}".format(xx) + " has won!")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["suggest", "sg"])
 async def sugg(ctx, *args):
     sugg = ' '.join(args)
     swears = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard', 'bitch', 'biatch', 'bloody', 'blowjob', 'blow', 'bollock', 'bollok', 'boner', 'boob', 'bugger', 'bum', 'butt', 'buttplug', 'clitoris', 'cock', 'coon', 'crap', 'cunt', 'damn', 'dick', 'dildo', 'dyke', 'fag', 'feck', 'fellate', 'fellatio', 'felching', 'fuck', 'fudgepacker', 'packer', 'flange', 'goddamn', 'damn', 'hell', 'homo', 'jerk', 'jizz', 'knobend', 'knob', 'end', 'labia', 'lmao', 'lmfao', 'muff', 'nigger', 'nigga', 'omg', 'penis', 'piss', 'poop', 'porn', 'prick', 'pube', 'pussy', 'queer', 'scrotum', 'sex', 'shit', 'sh1t', 'slut', 'smegma', 'spunk', 'tit', 'tosser', 'turd', 'twat', 'vagina', 'wank', 'whore', 'wtf', 'negro', 'succ', 'retard', 'shiet', 'gay', 'dong', 'killyourself']
@@ -1873,7 +1866,7 @@ async def sugg(ctx, *args):
         f.close()
         await ctx.message.channel.send("Suggestion sent!")
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=["csgoprice", "csprice", "counterstrikeglobaloffensiveprice"])
 async def csp(ctx, *args):
     s = ' '.join(args)
     try:
