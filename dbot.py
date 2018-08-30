@@ -838,9 +838,7 @@ async def servers(ctx):
 async def info(ctx):
     x = 0
     for server in client.guilds:
-        for user in server.members:
-            if(not user.bot):
-                x += 1
+        x += len(server.members)
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.set_author(name="Bot Info")
     emb.add_field(name="Bot Name", value=client.user.name)
