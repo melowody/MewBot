@@ -1,13 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
-import discord, urllib.request, time, datetime, fileinput, requests, ast, sys, contextlib, decimal, html, base64, math, itertools, re, asyncio, shutil, PIL.ImageOps, urllib, io, array, binascii, os, hashlib, traceback, subprocess, codecs, pokeapi, sqlite3
-import discord.utils
-import numpy as np
+import discord, urllib.request, time, datetime, fileinput, requests, ast, sys, contextlib, decimal, html, base64, math, itertools, re, asyncio, shutil, PIL.ImageOps, urllib, io, array, binascii, os, hashlib, traceback, subprocess, codecs, pokeapi, sqlite3, concurrent.futures as futures, math, wave, struct, discord.utils, numpy as np, random as modnar, html
 from twitch import TwitchClient
 from bitstring import BitArray
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from selenium import webdriver
-import random as modnar
 from io import StringIO
 from discord.ext.commands import Bot
 from discord.ext import commands
@@ -21,176 +18,11 @@ from tempfile import NamedTemporaryFile
 from subprocess import check_output
 from steampy.client import SteamClient, Asset
 from steampy.utils import GameOptions
-import math
-import wave
-import struct
 from pydub import AudioSegment
 from googletrans import Translator
 from discord.ext.commands import Paginator
 
 AudioSegment.converter = "C:/Users/Administrator/Desktop/FFMPEG/ffmpeg-20180828-26dc763-win64-static/bin/ffmpeg.exe"
-
-class StopPagination(Exception):
-    pass
-
-class CannotPaginate(Exception):
-    pass
-
-class Pages:
-    '''Implements a paginator that queries the user for the
-    pagination interface.
-    Pages are 1-index based, not 0-index based.
-    If the user does not reply within 1 minute then the pagination
-    interface exits automatically.
-    Parameters
-    ------------
-    bot
-        The bot instance.
-    message
-        The message that initiated this session.
-    entries
-        A list of entries to paginate.
-    per_page
-        How many entries show up per page.
-    '''
-    def __init__(self, bot, *, message, entries, per_page=12):
-        self.bot = bot
-        self.entries = entries
-        self.message = message
-        self.author = message.author
-        self.per_page = per_page
-        pages, left_over = divmod(len(self.entries), self.per_page)
-        if left_over:
-            pages += 1
-        self.maximum_pages = pages
-        self.reaction_emojis = [
-            ('\N{BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}', self.first_page, ':track_previous:'),
-            ('\N{BLACK LEFT-POINTING TRIANGLE}', self.previous_page, ':arrow_backward:'),
-            ('\N{BLACK RIGHT-POINTING TRIANGLE}', self.next_page, ':arrow_forward:'),
-            ('\N{BLACK RIGHT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}', self.last_page, ':track_next:'),
-            ('\N{INPUT SYMBOL FOR NUMBERS}', self.numbered_page , ':1234:'),
-            ('\N{BLACK SQUARE FOR STOP}', self.stop_pages, ':stop_button:'),
-            ('\N{INFORMATION SOURCE}', self.show_help, ':information_source:'),
-        ]
-
-        # verify we can actually use the pagination session
-        server = self.message.server
-        if server is not None:
-            permissions = self.message.channel.permissions_for(server.me)
-            if not permissions.add_reactions:
-                raise CannotPaginate()
-
-    def get_page(self, page):
-        base = (page - 1) * self.per_page
-        return self.entries[base:base + self.per_page]
-
-    async def show_page(self, page, *, first=False):
-        self.current_page = page
-        entries = self.get_page(page)
-        p = ['```']
-        for t in enumerate(entries, 1 + ((page - 1) * self.per_page)):
-            p.append('%s. %s' % t)
-        p.append('')
-        p.append('Page %s/%s (%s entries)' % (page, self.maximum_pages, len(self.entries)))
-
-        if first:
-            p.append('')
-            p.append('Confused? React with \N{INFORMATION SOURCE} for more info.')
-            p.append('```')
-            self.message = await self.bot.send_message(self.message.channel, '\n'.join(p))
-            for (reaction, _, __) in self.reaction_emojis:
-                await self.bot.add_reaction(self.message, reaction)
-                await asyncio.sleep(0.5)
-        else:
-            p.append('```')
-            await self.bot.edit_message(self.message, '\n'.join(p))
-
-    async def checked_show_page(self, page):
-        if page == 0:
-            return await self.bot.send_message(self.message.channel, 'Page 0 does not exist.')
-        elif page > self.maximum_pages:
-            return await self.bot.send_message(self.message.channel, 'Too far ahead (%s/%s)' % (page, self.maximum_pages))
-        else:
-            await self.show_page(page)
-
-    async def first_page(self):
-        '''goes to the first page'''
-        await self.show_page(1)
-
-    async def last_page(self):
-        await self.show_page(self.maximum_pages)
-
-    async def next_page(self):
-        await self.checked_show_page(self.current_page + 1)
-
-    async def previous_page(self):
-        await self.checked_show_page(self.current_page - 1)
-
-    async def page_c(self):
-        await self.checked_show_page(self.current_page)
-
-    async def numbered_page(self):
-        to_delete = []
-        to_delete.append(await self.bot.send_message(self.message.channel, 'What page do you want to go to?'))
-        msg = await self.bot.wait_for_message(author=self.author, channel=self.message.channel,
-                                              check=lambda m: m.content.isdigit(), timeout=30.0)
-        if msg is not None:
-            page = int(msg.content)
-            to_delete.append(msg)
-            ret = await self.checked_show_page(page)
-            if ret is not None:
-                to_delete.append(ret)
-        else:
-            to_delete.append(await self.bot.send_message(self.message.channel, 'Took too long.'))
-            await asyncio.sleep(5)
-
-        await self.bot.delete_messages(to_delete)
-
-    async def show_help(self):
-        messages = ['```\nWelcome to the interactive paginator!\n']
-        messages.append('This interactively allows you to see pages of text by navigating with\n'
-                        'reactions. They are as follows:\n')
-
-        alignment = len(max(self.reaction_emojis, key=lambda t: len(t[2]))[2])
-        fmt = '{:<{width}} -- {}'
-        for (_, func, emoji) in self.reaction_emojis:
-            messages.append(fmt.format(emoji, func.__doc__, width=alignment))
-
-        messages.append('```')
-        msg = await self.bot.send_message(self.message.channel, '\n'.join(messages))
-        await asyncio.sleep(30)
-        await self.bot.delete_message(msg)
-
-    async def stop_pages(self):
-        await self.bot.delete_message(self.message)
-        raise StopPagination()
-
-    def react_check(self, reaction, user):
-        if user.id != self.author.id:
-            return False
-
-        for (emoji, func, _) in self.reaction_emojis:
-            if reaction.emoji == emoji:
-                self.match = func
-                return True
-        return False
-
-    async def paginate(self):
-        await self.show_page(1, first=True)
-        while True:
-            react = await self.bot.wait_for_reaction(message=self.message, check=self.react_check, timeout=60.0)
-            if react is None:
-                break
-
-            try:
-                await self.bot.remove_reaction(self.message, react.reaction.emoji, react.user)
-            except:
-                pass # can't remove it so don't bother doing so
-
-            try:
-                await self.match()
-            except StopPagination:
-                break
 
 def robbd(s):
     s = base64.b64decode(s.encode('utf-8')).decode()
@@ -217,102 +49,12 @@ los = {}
 
 dtupt = datetime.datetime.now()
 
-mid = [0, [], 0, ""]
-conf = None
-counn = 0
-counn2 = 0
-
-audio = []
-
-def append_silence(duration_milliseconds=500):
-    global audio
-    sample_rate = 44100.0
-    num_samples = duration_milliseconds * (sample_rate / 1000.0)
-
-    for x in range(int(num_samples)):
-        audio.append(0.0)
-
-    return
-
-
-def append_sinewave(
-        freq=440.0,
-        duration_milliseconds=500,
-        volume=1.0):
-    global audio
-    sample_rate = 44100.0
-
-    global audio # using global variables isn't cool.
-
-    num_samples = duration_milliseconds * (sample_rate / 1000.0)
-
-    for x in range(int(num_samples)):
-        audio.append(volume * math.sin(2 * math.pi * freq * ( x / sample_rate )))
-
-    return
-
-
-def save_wav(file_name):
-    global audio
-    sample_rate = 44100.0
-    # Open up a wav file
-    wav_file=wave.open(file_name,"w")
-
-    # wav params
-    nchannels = 1
-
-    sampwidth = 2
-
-    # 44100 is the industry standard sample rate - CD quality.  If you need to
-    # save on file size you can adjust it downwards. The stanard for low quality
-    # is 8000 or 8kHz.
-    nframes = len(audio)
-    comptype = "NONE"
-    compname = "not compressed"
-    wav_file.setparams((nchannels, sampwidth, sample_rate, nframes, comptype, compname))
-
-    # WAV files here are using short, 16 bit, signed integers for the
-    # sample size.  So we multiply the floating point data we have by 32767, the
-    # maximum value for a short integer.  NOTE: It is theortically possible to
-    # use the floating point -1.0 to 1.0 data directly in a WAV file but not
-    # obvious how to do that using the wave module in python.
-    for sample in audio:
-        wav_file.writeframes(struct.pack('h', int( sample * 32767.0 )))
-
-    wav_file.close()
-
-    return
-
 @client.event
 async def on_message(message):
     if(message.content[0:3] == "mb!" and message.author.name != "MewBot"):
         if(not message.author.bot):
             await client.process_commands(message)
-'''
-@client.event
-async def on_command_error(ctx, error):
-    x = traceback.format_exception_only(type(error), error)[0]
-    y = traceback.format_exception(type(error), error, error.__traceback__)
-    if('Command raised an exception: ' in x):
-        x = x.split('an exception: ')[1]
-    x = x.split('\n')[0]
-    a = ""
-    for i in y:
-        if("dbot.py" in i):
-            a = i
-            break
-    if(a != ""):
-        a = a.split(', ')
-        a1 = a[1]
-        a2 = a[2].split('\n    ')[1].split('\n')[0]
-        print("[WARNING]: " + ctx.message.content + " | dbot.py, " + a1 + ": " + a2 + ": " + x)
-    else:
-        print("[WARNING]: " + ctx.message.content + " | dbot.py")
-    if(isinstance(error, commands.CommandNotFound)):
-        pass
-    else:
-        await ctx.message.channel.send("Wait no that hurt bad error.")
-'''
+
 @client.event
 async def on_server_remove(server):
     game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds) - 1) + ' servers!', type=discord.ActivityType.watching)
@@ -340,14 +82,6 @@ async def on_ready():
     print("ID: {}".format(client.user.id))
     game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
     await client.change_presence(activity=game)
-'''
-@client.command(pass_context=True)
-async def optifine(ctx):
-    x = requests.get('https://optifine.net/home').text
-    percent = x.split('Minecraft 1.13: ')[1].split('<')[0]
-    reason = x.split('Minecraft 1.13: ')[1].split('</p')[0].split('>')[-1]
-    await ctx.message.channel.send(percent + reason)
-'''
 
 @client.command(pass_context=True, aliases=["8ball", "8b"])
 async def eightball(ctx, *args):
@@ -449,7 +183,7 @@ async def ban(ctx, user: discord.User):
     if (ctx.message.guild.get_member(ctx.message.author.id) == ctx.message.guild.owner):
         n = user.name
         d = user.discriminator
-        await client.ban(user)
+        await ctx.message.guild.ban(user)
         await ctx.message.channel.send("Banned " + str(n) + "#" + str(d) + "!")
 
 @client.command(pass_context=True)
@@ -564,30 +298,72 @@ async def uptime(ctx):
     await ctx.message.channel.send("MewBot has been online for " + ', '.join(y))
 
 @client.command(pass_context=True)
-async def demonlist(ctx, *args):
-    k = ' '.join(args)
-    if(args == ()):
-        l = []
-        for i in range(1, 6):
-            l.append(requests.get("https://pointercrate.com/demonlist/" + str(i)).text.split("<h1>")[1].split('</h1>')[0])
-        emb = (discord.Embed(colour=0xf7b8cf))
-        emb.set_author(name="Top 5 Hardest Demons in GD")
-        c = 0
-        for i in l:
-            c += 1
-            emb.add_field(name="#" + str(c), value=i)
-        await ctx.message.channel.send(embed=emb)
-    elif(isNum(k.split()[0])):
-        x = requests.get("https://pointercrate.com/demonlist/" + k.split()[0]).text
-        emb = (discord.Embed(colour=0xf7b8cf))
-        emb.set_author(name="#" + k.split()[0] + " - " + x.split("<h1>")[1].split('</h1>')[0])
-        if("tooltiptext fade" in x):
-            emb.add_field(name="Made By", value=' '.join(list(filter(lambda a: a != '', x.split("tooltiptext fade'>\n")[1].split("\n")[0].split(" ")))))
+async def demonlist(ctx):
+    message = ctx.message
+    current = 1
+    botmsg = await message.channel.send(embed=getdemoninfo(current))
+    await botmsg.add_reaction("⏪")
+    await botmsg.add_reaction("◀")
+    await botmsg.add_reaction("▶")
+    await botmsg.add_reaction("⏩")
+    await botmsg.add_reaction("⏹")
+    while(True):
+        def change(reaction, user):
+            return user == message.author
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
+        except futures.TimeoutError:
+            await botmsg.delete()
+            break
         else:
-            emb.add_field(name="Made", value=x.split("<h3>")[-1].split("</h3>")[0])
-        emb.add_field(name="Description", value=x.split("<q>")[1].split("</q>")[0])
-        emb.add_field(name="Number of 100%'s Achieved", value=x.split("which ")[1].split(" are 100%")[0])
-        await ctx.message.channel.send(embed=emb)
+            if(str(reaction.emoji) == "▶"):
+                if(current < 50):
+                    current += 1
+                    await botmsg.edit(embed=getdemoninfo(current))
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                else:
+                    current -= 1
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "◀"):
+                if(current > 0):
+                    current -= 1
+                    await botmsg.edit(embed=getdemoninfo(current))
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                else:
+                    current += 1
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "⏪"):
+                current = 1
+                await botmsg.edit(embed=getdemoninfo(current))
+                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "⏩"):
+                current = 50
+                await botmsg.edit(embed=getdemoninfo(current))
+                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "⏹"):
+                await botmsg.delete()
+                break
+            continue
+
+def getdemoninfo(i):
+    fin = []
+    r = requests.get('https://pointercrate.com/api/v1/demons/' + str(i))
+    x = ast.literal_eval(r.text.replace('false', 'False').replace('null', 'None').replace('true', 'True'))['data']
+    creators = [i['name'] for i in x['creators']]
+    verifier = x['verifier']['name']
+    video = x['video']
+    name = x['name']
+    r = requests.get('https://pointercrate.com/demonlist/' + str(i))
+    desc = html.unescape(r.text.split('<q>')[1].split('</q>')[0])
+    finalemb = discord.Embed(colour=0xf7b8cf)
+    if(video == None):
+        finalemb.set_author(name=name + " - #" + str(i))
+    else:
+        finalemb.set_author(name=name + " - #" + str(i), url=video)
+    finalemb.add_field(name="Description", value=desc)
+    finalemb.add_field(name="Creators", value='`' + ', '.join(creators) + '`')
+    finalemb.add_field(name="Verifier", value=verifier)
+    return finalemb
 
 def blurpled(im):
     im = im.convert("LA")
@@ -768,64 +544,6 @@ async def setID(ctx, ID):
         f = open("ids.txt", "r")
         await ctx.message.channel.send("You have already set your ID! If you need it changed, contact me at Venom#8068")
     f.close()
-
-'''@client.command(pass_context=True)
-async def trade(ctx):
-    z = await ctx.message.channel.send("Processing...")
-    with codecs.open("ids.txt", "r", encoding="utf8") as f:
-        count = -1
-        x = f.read().split('\n')
-        for i in range(len(x)):
-            if(ctx.message.author.id in x[i]):
-                count = i
-    if(count == -1):
-        await ctx.message.channel.send("You haven't used this before! Use the command `mb!setID STEAMID64` to set your ID!")
-    else:
-        y = x[count]
-        pid = y.split()[1]
-        partner_id = pid
-        game = GameOptions.CS
-        partner_items = steam_client.get_partner_inventory(partner_id, game)
-        l = []
-        for i in partner_items.values():
-            j = i['market_name']
-            if ("|" in j and "Graffiti" not in j):
-                y = urllib.parse.quote_plus(j).split('+%28')[0].replace('+', '_')
-                x = requests.get('https://csgoitems.pro/en/skin/' + y)
-                l.append([j, i['id'], float(x.text.split('%28' + j.split(' (')[1].replace(')', '%29'))[1].split('data-csgoitems="')[1].split('"')[0])])
-        emb = (discord.Embed(colour=0xf7b8cf))
-        emb.add_field(name="Name", value=l[0][0])
-        emb.add_field(name="Price", value=l[0][2])
-        botmsg = await client.edit_message(z, new_content=" ", embed=emb)
-        await client.add_reaction(botmsg, "⬅")
-        await client.add_reaction(botmsg, "➡")
-        await client.add_reaction(botmsg, "✅")
-        global mid
-        mid = [botmsg.id, l, 0, partner_id]'''
-
-@client.command(pass_context=True)
-async def csgostats(ctx, id):
-    x = requests.get("https://steamidfinder.com/lookup/" + id)
-    soup = BeautifulSoup(x.content, "html.parser")
-    if('''profile state
-         <code>
-          private
-         </code>''' in soup.prettify()):
-        await ctx.message.channel.send("This profile is private!")
-    else:
-        id = soup.prettify().split('''<a class="btn btn-default" href="steam://friends/add/''')[1].split('"')[0]
-        x = requests.get("http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key=EAD9EED5F353FD228141B75D4DF5274C&steamid=" + id)
-        c = x.text
-        t = requests.get('http://steamcommunity.com/profiles/' + id)
-        a = t.text
-        b = requests.get('http://steamrep.com/profiles/' + id)
-        d = b.text
-        name = a.split('<span class="actual_persona_name">')[1].split('</span>')[0]
-        country = a.split('<img class="profile_flag" src="')[1].split('</div')[0].split('">')[1].replace("	", "").split(" ")[-1]
-        emb = (discord.Embed(colour=0xf7b8cf))
-        emb.set_author(name="CSGO Stats - " + name)
-        emb.add_field(name="WIP", value="WIP")
-        await ctx.message.channel.send(embed=emb)
 
 
 @client.command(pass_context=True, aliases=["listservers"])
@@ -1368,8 +1086,8 @@ async def server(ctx, host):
 @client.command(pass_context=True)
 async def ifunny(ctx):
     #<img class="media__image" src="
-    resp = urllib.request.urlopen('https://ifunny.co/feeds/shuffle')
-    page = str(resp.read())
+    resp = requests.get('https://ifunny.co/feeds/shuffle')
+    page = resp.text
     thumbnail = str(page.split('<img class="media__image" src="')[1].split('"')[0])
     emb = (discord.Embed(colour=0xf7b8cf))
     emb.set_author(name="Random Feature")
@@ -1379,13 +1097,13 @@ async def ifunny(ctx):
 @client.command(pass_context=True, aliases=["ytsearch", "youtubesearch", "youtube"])
 async def ysearch(ctx, *args):
     s = ' '.join(args)
-    resp = urllib.request.urlopen('https://www.youtube.com/results?search_query=' + urllib.parse.quote(s))
-    page = str(resp.read())
+    resp = requests.get('https://www.youtube.com:80/results?search_query=' + urllib.parse.quote(s))
+    page = resp.text
     name = page.split('<h3 class="yt-lockup-title "><a href=')[1].split('>')[1].split('<')[0]
-    link = "https://www.youtube.com" + page.split('<h3 class="yt-lockup-title "><a href=')[1].split('"')[1]
+    link = "https://www.youtube.com:80" + page.split('<h3 class="yt-lockup-title "><a href=')[1].split('"')[1]
     thumbnail=str(page.split('<span class="yt-thumb-simple">')[1].split('src="')[1].split('"')[0])
-    resp2 = urllib.request.urlopen(link)
-    page2 = str(resp2.read())
+    resp2 = requests.get(link)
+    page2 = resp2.text
     desc = html.unescape(page2.split('<meta itemprop="description" content="')[1].split('"')[0])
     a = list(desc)
     emb = (discord.Embed(colour=0xf7b8cf))
