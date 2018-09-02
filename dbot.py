@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-import discord, urllib.request, time, datetime, fileinput, requests, ast, sys, contextlib, decimal, html, base64, math, itertools, re, asyncio, shutil, PIL.ImageOps, urllib, io, array, binascii, os, hashlib, traceback, subprocess, codecs, pokeapi, sqlite3, concurrent.futures as futures, math, wave, struct, discord.utils, numpy as np, random as modnar, html
+import discord, urllib.request, time, datetime, fileinput, requests, ast, sys, contextlib, decimal, html, base64, math, itertools, re, asyncio, shutil, PIL.ImageOps, urllib, io, array, binascii, os, hashlib, traceback, subprocess, codecs, pokeapi, sqlite3, concurrent.futures as futures, math, wave, struct, discord.utils, numpy as np, random as modnar, html, dbl, logging, aiohttp
 from twitch import TwitchClient
 from bitstring import BitArray
 from urllib.request import Request, urlopen
@@ -23,6 +23,52 @@ from googletrans import Translator
 from discord.ext.commands import Paginator
 
 AudioSegment.converter = "C:/Users/Administrator/Desktop/FFMPEG/ffmpeg-20180828-26dc763-win64-static/bin/ffmpeg.exe"
+
+async def Paginator(message, x):
+    current = 0
+    botmsg = await message.channel.send(embed=x[current])
+    await botmsg.add_reaction("⏪")
+    await botmsg.add_reaction("◀")
+    await botmsg.add_reaction("▶")
+    await botmsg.add_reaction("⏩")
+    while(True):
+        def change(reaction, user):
+            return user == message.author
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
+        except futures.TimeoutError:
+            await message.channel.delete_messages([botmsg])
+            break
+        else:
+            if(str(reaction.emoji) == "▶"):
+                try:
+                    current += 1
+                    await botmsg.edit(embed=x[current])
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                except IndexError:
+                    current -= 1
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "◀"):
+                if(current > 0):
+                    current -= 1
+                    await botmsg.edit(embed=x[current])
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                else:
+                    current += 1
+                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "⏪"):
+                current = 0
+                await botmsg.edit(embed=x[current])
+                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "⏩"):
+                current = len(x) - 1
+                await botmsg.edit(embed=x[current])
+                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+            elif(str(reaction.emoji) == "⏹"):
+                await botmsg.delete()
+                break
+            continue
 
 def robbd(s):
     s = base64.b64decode(s.encode('utf-8')).decode()
@@ -59,6 +105,9 @@ async def on_message(message):
 async def on_server_remove(server):
     game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds) - 1) + ' servers!', type=discord.ActivityType.watching)
     await client.change_presence(activity=game)
+    payload = {"server_count": len(client.guilds)}
+    async with aiohttp.ClientSession() as aioclient:
+        await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
 
 @client.event
 async def on_server_join(server):
@@ -74,6 +123,9 @@ async def on_server_join(server):
     conn.commit()
     game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
     await client.change_presence(activity=game)
+    payload = {"server_count": len(client.guilds)}
+    async with aiohttp.ClientSession() as aioclient:
+        await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
 
 @client.event
 async def on_ready():
@@ -82,6 +134,9 @@ async def on_ready():
     print("ID: {}".format(client.user.id))
     game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
     await client.change_presence(activity=game)
+    payload = {"server_count": len(client.guilds)}
+    async with aiohttp.ClientSession() as aioclient:
+        await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
 
 @client.command(pass_context=True, aliases=["8ball", "8b"])
 async def eightball(ctx, *args):
@@ -307,17 +362,29 @@ async def demonlist(ctx):
     await botmsg.add_reaction("▶")
     await botmsg.add_reaction("⏩")
     await botmsg.add_reaction("⏹")
+    await botmsg.add_reaction("🔢")
+
+    def isNum(x):
+        try:
+            l = int(x)
+            return True
+        except ValueError:
+            return False
+
+    def check(m):
+        return isNum(m.content) and m.author == message.author and m.channel == message.channel
+
     while(True):
         def change(reaction, user):
             return user == message.author
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
-            await botmsg.delete()
+            await message.channel.delete_messages([botmsg])
             break
         else:
             if(str(reaction.emoji) == "▶"):
-                if(current < 50):
+                if(current < 100):
                     current += 1
                     await botmsg.edit(embed=getdemoninfo(current))
                     await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
@@ -337,13 +404,22 @@ async def demonlist(ctx):
                 await botmsg.edit(embed=getdemoninfo(current))
                 await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
             elif(str(reaction.emoji) == "⏩"):
-                current = 50
+                current = 100
                 await botmsg.edit(embed=getdemoninfo(current))
                 await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
             elif(str(reaction.emoji) == "⏹"):
                 await botmsg.delete()
                 break
-            continue
+            elif(str(reaction.emoji) == "🔢"):
+                msg = await client.wait_for('message', check=check)
+                current = int(msg.content)
+                if(current > 100):
+                    current = 100
+                elif(current < 1):
+                    current = 1
+                await botmsg.edit(embed=getdemoninfo(current))
+                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                await msg.delete()
 
 def getdemoninfo(i):
     fin = []
@@ -522,7 +598,7 @@ async def otter(ctx):
 @client.command(pass_context=True, aliases=["inv"])
 async def invite(ctx):
     emb = (discord.Embed(colour=0xf7b8cf))
-    emb.add_field(name="Invite Link", value="https://discordapp.com/api/oauth2/authorize?client_id=280124040046444546&permissions=0&scope=bot")
+    emb.add_field(name="Invite Link", value="https://bit.ly/2wzmka1")
     emb.set_footer(text="Thanks for inviting MewBot!")
     await ctx.message.channel.send(embed=emb)
 
@@ -1408,7 +1484,7 @@ async def help(ctx, *args):
     if(x == []):
         emb = (discord.Embed(colour=0xf7b8cf))
         emb.set_author(name="Help Menu for " + str(client.user.name))
-        emb.add_field(name="Links", value="Invite: https://bit.ly/2PQirGA\nYoutube: https://bit.ly/2LBCd6B\nTwitter: https://bit.ly/2IPFv8u", inline=True)
+        emb.add_field(name="Links", value="Invite: https://bit.ly/2wzmka1\nYoutube: https://bit.ly/2LBCd6B\nTwitter: https://bit.ly/2IPFv8u", inline=True)
         emb.add_field(name="Help Commands", value="Fun: mb!help --fun\nEncryption: mb!help --encryption\nMoney: mb!help --money\nInfo: mb!help --info\nModeration: mb!help --mod", inline=True)
         await ctx.message.channel.send(embed = emb)
     elif(x[0] == "--fun"):
@@ -1579,9 +1655,14 @@ async def sugg(ctx, *args):
     if(count > 0):
         await ctx.message.channel.send("Your suggestion looked like spam, so it wasn't sent!")
     else:
-        f = open("sugg.txt", "a")
+        f = codecs.open("sugg.txt", "a", encoding="utf-8")
         f.write(x + " - Suggested by " + str(ctx.message.author) + "\n")
         f.close()
+        me = await client.get_user_info(190804082032640000)
+        emb = (discord.Embed(colour=0xf7b8cf))
+        emb.add_field(name=str(ctx.message.author), value=x)
+        emb.set_footer(text="Sent at " + datetime.datetime.now().strftime("%m-%d-%Y %H:%M:%S") + " EST")
+        await me.send(embed=emb)
         await ctx.message.channel.send("Suggestion sent!")
 
 @client.command(pass_context=True, aliases=["csgoprice", "csprice", "counterstrikeglobaloffensiveprice"])
