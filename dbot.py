@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-import discord, urllib.request, time, datetime, fileinput, requests, ast, sys, contextlib, decimal, html, base64, math, itertools, re, asyncio, shutil, PIL.ImageOps, urllib, io, array, binascii, os, hashlib, traceback, subprocess, codecs, pokeapi, sqlite3, concurrent.futures as futures, math, wave, struct, discord.utils, numpy as np, random as modnar, html, dbl, logging, aiohttp
+import discord, urllib.request, time, datetime, fileinput, requests, ast, sys, contextlib, decimal, html, base64, math, itertools, re, asyncio, shutil, PIL.ImageOps, urllib, io, array, binascii, os, hashlib, traceback, subprocess, codecs, pokeapi, sqlite3, concurrent.futures as futures, math, wave, struct, discord.utils, numpy as np, random as modnar, html, dbl, logging, aiohttp, whois as wis, pycountry, socket
 from twitch import TwitchClient
 from bitstring import BitArray
 from urllib.request import Request, urlopen
@@ -31,6 +31,8 @@ async def Paginator(message, x):
     await botmsg.add_reaction("◀")
     await botmsg.add_reaction("▶")
     await botmsg.add_reaction("⏩")
+    await botmsg.add_reaction("⏹")
+    await botmsg.add_reaction("\U0001F522")
     while(True):
         def change(reaction, user):
             return user == message.author
@@ -68,6 +70,16 @@ async def Paginator(message, x):
             elif(str(reaction.emoji) == "⏹"):
                 await botmsg.delete()
                 break
+            elif(str(reaction.emoji) == "\U0001F522"):
+                msg = await client.wait_for('message', check=check)
+                current = int(msg.content)
+                if(current > 100):
+                    current = 100
+                elif(current < 1):
+                    current = 1
+                await botmsg.edit(embed=x[current])
+                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                await msg.delete()
             continue
 
 def robbd(s):
@@ -98,6 +110,8 @@ dtupt = datetime.datetime.now()
 @client.event
 async def on_message(message):
     if(message.content[0:3] == "mb!" and message.author.name != "MewBot"):
+        game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
+        await client.change_presence(activity=game)
         if(not message.author.bot):
             await client.process_commands(message)
 
@@ -138,7 +152,42 @@ async def on_ready():
     async with aiohttp.ClientSession() as aioclient:
         await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
 
-@client.command(pass_context=True, aliases=["8ball", "8b"])
+@client.command(pass_context=True, aliases=["lookup", "domain"])
+async def whois(ctx, website):
+    try:
+        wi = wis.whois(website)
+        if(wi['domain_name'] == None):
+            await ctx.message.channel.send('Domain not found!')
+        else:
+            emb = (discord.Embed(colour=0xf7b8cf))
+            ud = wi['updated_date']
+            emb.set_author(name=website, url=('http://' + website if not website.startswith('http') else website))
+            if(wi['registrar']):
+                emb.add_field(name="Registrar", value=wi['registrar'])
+            if(wi['creation_date']):
+                if(type(wi['creation_date']) != type([])):
+                    emb.add_field(name="Creation Date", value=wi['creation_date'].strftime("%A, %b %d, %Y at %I:%M:%S %p UTC"))
+                else:
+                    emb.add_field(name="Creation Date", value=wi['creation_date'][-1].strftime("%A, %b %d, %Y at %I:%M:%S %p UTC"))
+            if(ud):
+                emb.add_field(name="Updated Date", value=(ud.strftime("%A, %b %d, %Y at %I:%M:%S %p UTC") if type(ud) != type([]) else ud[-1].strftime("%A, %b %d, %Y at %I:%M:%S %p UTC")))
+            if(wi['expiration_date']):
+                emb.add_field(name="Expiration Date", value=(wi['expiration_date'].strftime("%A, %b %d, %Y at %I:%M:%S %p UTC") if type(wi['expiration_date']) != type([]) else wi['expiration_date'][-1].strftime("%A, %b %d, %Y at %I:%M:%S %p UTC")))
+            if(wi['name']):
+                emb.add_field(name="Name", value=wi['name'])
+            if(wi['org']):
+                emb.add_field(name="Organization", value=wi['org'])
+            if(wi['address']):
+                emb.add_field(name="Address", value=wi['address'])
+            try:
+                emb.add_field(name="Location", value=wi['city'] + ", " + wi['state'] + pycountry.countries.get(alpha_2=wi['country']).name + " " + ("" if len(wi['zipcode']) != 5 or zipcode == "00000" else wi['zipcode']))
+            except:
+                ' '
+            await ctx.message.channel.send(embed=emb)
+    except (socket.timeout, ConnectionResetError):
+        await ctx.message.channel.send('Timeout occurred when connecting to ' + website)
+
+@client.command(pass_context=True, aliases=["8ball", "8b"], description="Try your luck with the 8ball!", brief='<DESCRIPTION>')
 async def eightball(ctx, *args):
     message = ' '.join(args)
     out = ""
@@ -197,7 +246,7 @@ async def wtp(ctx, *args):
         os.remove(x[0])
         conn = sqlite3.connect('WTP.db')
         c = conn.cursor()
-        c.execute("UPDATE WTP SET Pokemon=? WHERE Channel=?", (x[1], str(ctx.message.channel.id)))
+        c.execute("UPDATE WTP SET Pokemon=? WHERE Channel=?", (x[1].replace('_', ' ').replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', ''), str(ctx.message.channel.id)))
         conn.commit()
     else:
         p = ' '.join(args).replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')
@@ -362,7 +411,7 @@ async def demonlist(ctx):
     await botmsg.add_reaction("▶")
     await botmsg.add_reaction("⏩")
     await botmsg.add_reaction("⏹")
-    await botmsg.add_reaction("🔢")
+    await botmsg.add_reaction("\U0001F522")
 
     def isNum(x):
         try:
@@ -410,7 +459,7 @@ async def demonlist(ctx):
             elif(str(reaction.emoji) == "⏹"):
                 await botmsg.delete()
                 break
-            elif(str(reaction.emoji) == "🔢"):
+            elif(str(reaction.emoji) == "\U0001F522"):
                 msg = await client.wait_for('message', check=check)
                 current = int(msg.content)
                 if(current > 100):
@@ -672,7 +721,9 @@ async def bigletter(ctx, *args):
     for i in f:
         i = i.lower()
         if(i in list("abcdefghijklmnopqrstuvwxyz")):
-            fin += ":regional_indicator_" + i + ": "
+            fin += ":regional_indicator_" + i + ":"
+        elif(i in list("1234567890")):
+            fin += ":" + i.replace('1', 'one').replace('2', 'two').replace('3', 'three').replace('4', 'four').replace('5', 'five').replace('6', 'six').replace('7', 'seven').replace('8', 'eight').replace('9', 'nine').replace('0', 'zero') + ":"
         else:
             fin += i
     emb = (discord.Embed(colour=0xf7b8cf))
@@ -1165,8 +1216,19 @@ async def ifunny(ctx):
     resp = requests.get('https://ifunny.co/feeds/shuffle')
     page = resp.text
     thumbnail = str(page.split('<img class="media__image" src="')[1].split('"')[0])
+    x = requests.get("https://ifunny.co" + str(page.split('<img class="media__image" src="')[0].split('href="')[-1].split('"')[0].split('?galler')[0])).text
+    with codecs.open("ifunny.txt", "w", encoding="utf-8") as f:
+        f.write(x)
+    author = x.split('ontent_meta" href="/user/')[1].split('"')[0]
+    tags = [i.split('<')[0] for i in x.split('"metapanel__copyright')[0].split('tag__name">')[1:]]
+    likes = x.split('actionlink__text">')[1].split('<')[0]
+    comments = x.split('actionlink__text">')[2].split('<')[0]
     emb = (discord.Embed(colour=0xf7b8cf))
-    emb.set_author(name="Random Feature")
+    emb.set_author(name="Random Feature", url="https://ifunny.co" + str(page.split('<img class="media__image" src="')[0].split('href="')[-1].split('"')[0].split('?galler')[0]))
+    emb.add_field(name="Author", value=author)
+    emb.add_field(name="Tags", value="`" + ', '.join(tags) + '`')
+    emb.add_field(name="Comments", value=comments)
+    emb.add_field(name="Likes", value=likes)
     emb.set_image(url=thumbnail)
     await ctx.message.channel.send(embed=emb)
 
