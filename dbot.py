@@ -1301,32 +1301,35 @@ async def a85e(ctx, *args):
     await ctx.message.channel.send(embed=emb)
 
 @client.command(pass_context=True, aliases=["user"])
-async def userinfo(ctx, user: discord.User):
-    try:
-        emb = (discord.Embed(colour=0xf7b8cf))
-        av = user.avatar_url
-        member = ctx.message.guild.get_member(user_id=user.id)
-        username = user.name
-        nick = user.display_name
-        disc = user.discriminator
-        stat = str(member.status)
-        eyedee = str(user.id)
-        cr = (member.created_at + datetime.timedelta(hours=-5)).strftime("%m-%d-%Y %H:%M:%S")
+async def userinfo(ctx, user: discord.User = None):
+    if(not user):
+        user = client.get_user(ctx.message.author.id)
+    emb = (discord.Embed(colour=0xf7b8cf))
+    av = user.avatar_url
+    member = ctx.message.guild.get_member(user_id=user.id)
+    username = user.name
+    nick = user.display_name
+    disc = user.discriminator
+    stat = str(member.status)
+    eyedee = str(user.id)
+    cr = (member.created_at + datetime.timedelta(hours=-5)).strftime("%m-%d-%Y %H:%M:%S")
+    if(member.activity):
         E = list(str(member.activity.type).split('.')[-1])
         E[0] = E[0].upper()
         E = ''.join(E)
-        emb = (discord.Embed(colour=0xf7b8cf))
-        emb.set_thumbnail(url=av)
-        emb.add_field(name="Username", value=str(username))
-        emb.add_field(name="Nickname", value=nick)
-        emb.add_field(name="Discriminator (tag)", value=disc)
-        emb.add_field(name="Status", value=stat)
-        emb.add_field(name="User ID", value=eyedee)
+    else:
+        E = ""
+    emb = (discord.Embed(colour=0xf7b8cf))
+    emb.set_thumbnail(url=av)
+    emb.add_field(name="Username", value=str(username))
+    emb.add_field(name="Nickname", value=nick)
+    emb.add_field(name="Discriminator (tag)", value=disc)
+    emb.add_field(name="Status", value=stat)
+    emb.add_field(name="User ID", value=eyedee)
+    if(E != ""):
         emb.add_field(name=E, value=member.activity.name)
-        emb.set_footer(text="Created on " + cr + " EST")
-        await ctx.message.channel.send(embed=emb)
-    except:
-        await ctx.message.channel.send("Error" + str(sys.exc_info()[0]))
+    emb.set_footer(text="Created on " + cr + " EST")
+    await ctx.message.channel.send(embed=emb)
 
 
 @client.command(pass_context=True, aliases=["b64encode", "base64e", "base64encode"])
