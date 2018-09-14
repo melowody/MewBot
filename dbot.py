@@ -109,10 +109,43 @@ dtupt = datetime.datetime.now()
 
 @client.event
 async def on_message(message):
-    if(message.content[0:3] == "mb!" and message.author.name != "MewBot"):
-        game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
-        await client.change_presence(activity=game)
-        if(not message.author.bot):
+    conn = sqlite3.connect('Prefixes.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM Prefixes")
+    user_id = message.author.id
+    buffer = c.fetchall()
+    data = [i[0] for i in buffer]
+    c.close()
+    conn.close()
+    if(user_id in data):
+        cprefix = buffer[data.index(user_id)][-1]
+        if(message.content.startswith(cprefix) and not message.author.bot):
+            payload = {"server_count": len(client.guilds)}
+            async with aiohttp.ClientSession() as aioclient:
+                await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
+            x = 0
+            for server in client.guilds:
+                for user in server.members:
+                    if(not user.bot):
+                        x += 1
+            payload = {"guilds": len(client.guilds), "users": x}
+            async with aiohttp.ClientSession() as aioclient:
+                await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DISCORDBOTLIST.COM.txt").read()})
+            message.content = "mb!" + message.content[len(cprefix):]
+            await client.process_commands(message)
+    else:
+        if(message.content.startswith("mb!") and not message.author.bot):
+            payload = {"server_count": len(client.guilds)}
+            async with aiohttp.ClientSession() as aioclient:
+                await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
+            x = 0
+            for server in client.guilds:
+                for user in server.members:
+                    if(not user.bot):
+                        x += 1
+            payload = {"guilds": len(client.guilds), "users": x}
+            async with aiohttp.ClientSession() as aioclient:
+                await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DISCORDBOTLIST.COM.txt").read()})
             await client.process_commands(message)
 
 @client.event
@@ -151,6 +184,26 @@ async def on_ready():
     payload = {"server_count": len(client.guilds)}
     async with aiohttp.ClientSession() as aioclient:
         await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("DBL.txt").read()})
+
+@client.command(pass_context=True)
+async def setprefix(ctx, *args):
+    prefix = ' '.join(args)
+    conn = sqlite3.connect('Prefixes.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM Prefixes")
+    user_id = ctx.message.author.id
+    data = [i[0] for i in c.fetchall()]
+    if(user_id in data):
+        c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (prefix, user_id))
+        conn.commit()
+        c.close()
+        conn.close()
+    else:
+        c.execute("INSERT INTO Prefixes VALUES(?, ?)", (user_id, prefix))
+        conn.commit()
+        c.close()
+        conn.close()
+    await ctx.message.channel.send("Prefix set to ***__" + prefix + "__***!")
 
 @client.command(pass_context=True, aliases=["lookup", "domain"])
 async def whois(ctx, website):
@@ -680,9 +733,18 @@ async def servers(ctx):
             a += str(server.name)
             i = len(server.members)
             a += " | " + str(i)
+            try:
+                x = await server.invites()
+                a += " | " + str(x[-1].url)
+            except:
+                a += ""
             fin += a + "\n"
-    fin += "Finished"
-    await ctx.message.channel.send(fin)
+            x = [fin[idx:idx+2000] for idx,val in enumerate(fin) if idx%2000 == 0]
+        fin += "Finished"
+    else:
+        x = ["You don't have high enough permissions!"]
+    for i in x:
+        await ctx.message.channel.send(i)
 
 @client.command(pass_context=True)
 async def info(ctx):
@@ -1301,9 +1363,17 @@ async def a85e(ctx, *args):
     await ctx.message.channel.send(embed=emb)
 
 @client.command(pass_context=True, aliases=["user"])
-async def userinfo(ctx, user: discord.User = None):
-    if(not user):
+async def userinfo(ctx, *args):
+    if(args == ()):
         user = client.get_user(ctx.message.author.id)
+    elif (args[0][:2] == "<@" and args[0][-1] == ">"):
+        if (args[0][:3] == "<@!"):
+            y = args[0].split("<@!")[1].split(">")[0]
+        else:
+            y = args[0].split("<@")[1].split(">")[0]
+        user = await client.get_user_info(y)
+    elif(isNum(args[0])):
+        user = await client.get_user_info(args[0])
     emb = (discord.Embed(colour=0xf7b8cf))
     av = user.avatar_url
     member = ctx.message.guild.get_member(user_id=user.id)
