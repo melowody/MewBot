@@ -40,7 +40,7 @@ class Info:
             x = self.bot.get_command(cmd)
             emb = (discord.Embed(color=0xf7b8cf))
             emb.add_field(name=prefix + x.name, value=x.description)
-            emb.add_field(name="Usage", value=x.brief.replace('mb!', prefix))
+            emb.add_field(name="Usage", value='`' + x.brief.replace('mb!', prefix) + '`' if not x.brief.startswith('`') else x.brief.replace('mb!', prefix))
             if(x.aliases != []):
                 emb.set_footer(text="Aliases: " + ', '.join(x.aliases))
             else:
@@ -52,7 +52,7 @@ class Info:
             for x in cmds:
                 emb = (discord.Embed(color=0xf7b8cf))
                 emb.add_field(name=prefix + x.name, value=x.description)
-                emb.add_field(name="Usage", value=x.brief.replace('mb!', prefix))
+                emb.add_field(name="Usage", value='`' + x.brief.replace('mb!', prefix) + '`' if not x.brief.startswith('`') else x.brief.replace('mb!', prefix))
                 if(x.aliases != []):
                     emb.set_footer(text="Aliases: " + ', '.join(x.aliases))
                 else:
