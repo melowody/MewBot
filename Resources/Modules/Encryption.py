@@ -62,14 +62,14 @@ class Encryption:
         emb.add_field(name="MD5 Hash", value=hashlib.md5(m.encode('utf-8')).hexdigest())
         await ctx.send(embed=emb)
 
-    @commands.command(pass_context=True, aliases=["hexadecimald", "hexdecode", "hexadecimaldecode"], description="Decode a message from Hexadecimal!", brief="`mb!hexe Hello, world!`")
+    @commands.command(pass_context=True, aliases=["hexadecimald", "hexdecode", "hexadecimaldecode"], description="Decode a message from Hexadecimal!", brief="`mb!hexd 48656C6C6F2C20776F726C6421`")
     async def hexd(self, ctx, *args):
         s = ''.join(args)
         emb = (discord.Embed(color=0xf7b8cf))
-        emb.add_field(name="Hex Decoded String", value=base64.b16decode(s.encode('utf-8')).decode())
+        emb.add_field(name="Hex Decoded String", value=base64.b16decode(s.replace(' ', '').upper().encode('utf-8')).decode())
         await ctx.send(embed=emb)
 
-    @commands.command(pass_context=True, aliases=["hexadecimale", "hexencode", "hexadecimalencode"], description="Encode a message using Hexadecimal!", brief="`mb!hexd 48656C6C6F2C20776F726C6421`")
+    @commands.command(pass_context=True, aliases=["hexadecimale", "hexencode", "hexadecimalencode"], description="Encode a message using Hexadecimal!", brief="`mb!hexe Hello, world!`")
     async def hexe(self, ctx, *args):
         s = ' '.join(args)
         emb = (discord.Embed(color=0xf7b8cf))

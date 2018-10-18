@@ -1,7 +1,7 @@
 import asyncio, aiohttp
 
 async def get_weapon_skins(name):
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.get('https://csgostash.com/weapon/' + name) as f:
             r = await f.read()
     r = str(r)
@@ -10,7 +10,7 @@ async def get_weapon_skins(name):
 async def get_skin_info(weapon, name, wear, stattrak=False, souvenir=False):
     fin = ("StatTrak™ " if stattrak else "") + ("Souvenir " if souvenir else "") + weapon + " | " + name + " (" + wear + ")"
     ws = WeaponSkin(weapon, name, wear, stattrak=stattrak, souvenir=souvenir)
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.get('https://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name=' + fin) as sapi:
             p = await sapi.json()
             if(p['success']):

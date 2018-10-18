@@ -26,7 +26,7 @@ async def DemonlistPaginator(client, message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
-            await message.channel.delete_messages([botmsg])
+            await botmsg.delete()
             break
         else:
             if(str(reaction.emoji) == "▶"):
@@ -82,7 +82,7 @@ async def ReactionPaginator(client, message, x):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
-            await message.channel.delete_messages([botmsg])
+            await botmsg.delete()
             break
         else:
             if(str(reaction.emoji) == "▶"):
@@ -128,7 +128,7 @@ async def PaginatorNoSkip(client, message, x):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
-            await message.channel.delete_messages([botmsg])
+            await botmsg.delete()
             break
         else:
             if(str(reaction.emoji) == "▶"):
@@ -176,7 +176,7 @@ async def Paginator(client, message, x):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
-            await message.channel.delete_messages([botmsg])
+            await botmsg.delete()
             break
         else:
             if(str(reaction.emoji) == "▶"):

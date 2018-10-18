@@ -72,7 +72,7 @@ def gjpd(s):
 
 async def getdemoninfo(i):
     fin = []
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.get('https://pointercrate.com/api/v1/demons/' + str(i)) as f:
             r = await f.json()
     x = r['data']
@@ -80,7 +80,7 @@ async def getdemoninfo(i):
     verifier = x['verifier']['name']
     video = x['video']
     name = x['name']
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.get('https://pointercrate.com/demonlist/' + str(i)) as f:
             r = str(await f.read())
     desc = html.unescape(r.split('<q>')[1].split('</q>')[0]) if '<q>' in r else '-'
@@ -95,21 +95,21 @@ async def getdemoninfo(i):
     return finalemb
 
 async def get_level_pass(lid):
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         payload = {'gameVersion':'21', 'binaryVersion':'35', 'gdw':'0', 'levelID': lid, 'inc': '1', 'extras': '0', 'secret':'Wmfd2893gb7'}
         async with cs.post('http://www.boomlings.com/database/downloadGJLevel22.php', data=payload) as r:
             f = await r.text()
     return rted(f.split(':')[-1].split('#')[0])[1:] if f.split(':')[-1].split('#')[0] != "0" and f.split(':')[-1].split('#')[0] != "10" and f.split(':')[-1].split('#')[0] != "1" else 0
 
 async def get_level_info(inp):
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         payload = {'gameVersion':'21', 'binaryVersion':'35', 'gdw':'0', 'type':'0', 'str': inp, 'diff':'-', 'len':'-', 'page':'0', 'total':'0', 'unCompleted':'0', 'onlycCompleted':'0', 'featured':'0', 'original':'0', 'twoPlayer':'0', 'coins':'0', 'epic':'0', 'demonFilter':'1', 'secret':'Wmfd2893gb7'}
         async with cs.post('http://www.boomlings.com/database/getGJLevels21.php', data=payload) as r:
             f = await r.text()
     if(f == "-1"):
         return None
     lid = f.split(':')[1]
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         payload = {'gameVersion':'21', 'binaryVersion':'35', 'gdw':'0', 'type':'0', 'str': lid, 'diff':'-', 'len':'-', 'page':'0', 'total':'0', 'unCompleted':'0', 'onlycCompleted':'0', 'featured':'0', 'original':'0', 'twoPlayer':'0', 'coins':'0', 'epic':'0', 'demonFilter':'1', 'secret':'Wmfd2893gb7'}
         async with cs.post('http://www.boomlings.com/database/getGJLevels21.php', data=payload) as r:
             f = await r.text()
@@ -117,7 +117,7 @@ async def get_level_info(inp):
 
 async def get_top10():
     data={"gameVersion": "21", "binaryVersion": "35", "gdw": "0", "type": "top", "count": "10", "secret": "Wmfd2893gb7"}
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.post('http://www.boomlings.com/database/getGJScores20.php', data=data) as f:
             r = await f.read()
     r = str(r)
@@ -160,7 +160,7 @@ def get_difficulty(f):
         return "N/A"
 
 async def get_user_info(x):
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.post('http://www.boomlings.com/database/getGJUsers20.php', data={"gameVersion": "21", "binaryVersion": "35", "gdw": "0", "str": x, "secret": "Wmfd2893gb7"}) as f:
             r = await f.read()
         async with cs.post('http://www.boomlings.com/database/getGJUserInfo20.php', data={"gameVersion": "21", "binaryVersion": "35", "gdw": "0", "targetAccountID": str(r).split(':')[21], "secret": "Wmfd2893gb7"}) as f:

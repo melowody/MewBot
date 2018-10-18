@@ -2,7 +2,7 @@ import asyncio, aiohttp
 
 async def get_song_info(url):
     fin = None
-    async with aiohttp.ClientSession() as cs:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
         async with cs.get(url) as r:
             f = await r.text()
     if("No Audio Project exists" not in str(f) and "This audio was removed" not in str(f)):

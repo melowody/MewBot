@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, os, sqlite3
+import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, os, sqlite3, PIL.ImageOps
 from googletrans import Translator
 from PIL import Image
 from difflib import SequenceMatcher
@@ -7,6 +7,34 @@ from discord.ext import commands
 class Fun:
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(pass_context=True, description="Convert to small letters!", brief="mb!smallletter Hello, world!")
+    async def smallletter(self, ctx, *args):
+        sl = {'q': 'ᵠ', 'w': 'ʷ', 'e': 'ᵉ', 'r': 'ʳ', 't': 'ᵗ', 'y': 'ʸ', 'u': 'ᵘ', 'i': 'ᶦ', 'o': 'ᵒ', 'p': 'ᵖ', 'a': 'ᵃ', 's': 'ˢ', 'd': 'ᵈ', 'f': 'ᶠ', 'g': 'ᵍ', 'h': 'ʰ', 'j': 'ʲ', 'k': 'ᵏ', 'l': 'ˡ', 'z': 'ᶻ', 'x': 'ˣ', 'c': 'ᶜ', 'v': 'ᵛ', 'b': 'ᵇ', 'n': 'ⁿ', 'm': 'ᵐ', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '0': '⁰'}
+        args = ' '.join(args).split()
+        for i in range(len(args)):
+            j = args[i]
+            fin = ""
+            for l in j:
+              if(l.isalpha() or l.isdigit()):
+                fin = fin + sl[l.lower()]
+              else:
+                fin = fin + "\\" + l
+            args[i] = fin
+        emb = (discord.Embed(color=0xf7b8cf))
+        emb.add_field(name="Small Letter String", value=' '.join(args))
+        await ctx.send(embed=emb)
+            
+
+    @commands.command(pass_context=True, description="Invert an image!", brief="mb!invert @hellosarina")
+    async def invert(self, ctx, *args):
+        im = await ImgLib.GetImage(self.bot, ctx, args)
+        im = im.convert('RGB')
+        img = PIL.ImageOps.invert(im)
+        output_buffer = io.BytesIO()
+        img.save(output_buffer, "png")
+        output_buffer.seek(0)
+        await ctx.send(file=discord.File(output_buffer, filename="invert.png"))
 
     @commands.command(pass_context=True, description="Set the prefix that you'll use!", brief='mb!setprefix m!')
     async def setprefix(self, ctx, *args):
@@ -80,7 +108,7 @@ class Fun:
 
     @commands.command(pass_context=True, aliases=["shibe", "shiba", "shibainu", "inu"], description="Look at an adorable shibe!", brief='mb!shibe')
     async def shib(self, ctx):
-        async with aiohttp.ClientSession() as cs:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
             async with cs.get('http://shibe.online/api/shibes?count=1&urls=true&httpsUrls=true') as f:
                 x = str(await f.read())
         url = x.split('"')[1]
@@ -91,7 +119,7 @@ class Fun:
 
     @commands.command(pass_context=True, description="Get a random feature from iFunny!", brief='mb!ifunny')
     async def ifunny(self, ctx):
-        async with aiohttp.ClientSession() as cs:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
             async with cs.get('https://ifunny.co/feeds/shuffle') as f:
                 page = str(await f.read())
             thumbnail = str(page.split('<img class="media__image" src="')[1].split('"')[0])
@@ -119,25 +147,6 @@ class Fun:
         emb.add_field(name=lf + " -> " + lt, value=out.text)
         await ctx.send(embed=emb)
 
-    @commands.command(pass_context=True, description="Make some *beautiful* music!", brief='mb!music 480 D4|D4|D5||A4')
-    async def music(self, ctx, bpm, x):
-        x = str(MusicLib.do(bpm, x, ctx.message.author.discriminator + ctx.message.author.name))
-        m = int(x.replace('\r\n', ''))
-        if(m == 1):
-            await ctx.message.channel.send(file=discord.File(open(ctx.message.author.discriminator + ctx.message.author.name + "0.wav", "rb")))
-            os.remove(ctx.message.author.discriminator + ctx.message.author.name + "0.wav")
-        else:
-            x = []
-            for i in range(m):
-                x.append(AudioSegment.from_wav(ctx.message.author.discriminator + ctx.message.author.name + str(i) + ".wav"))
-            while(len(x) != 1):
-                x[0] = x[0].overlay(x[-1])
-                x.pop(-1)
-            x[0].export("fin.wav", format="wav")
-            await ctx.message.channel.send(file=discord.File(open("fin.wav", "rb")))
-            for i in range(m):
-                os.remove(ctx.message.author.discriminator + ctx.message.author.name + str(i) + ".wav")
-
     @commands.command(pass_context=True, aliases=["levelpass"], description="Get the password of a Geometry Dash level!", brief='mb!lpass Cataclysm')
     async def lpass(self, ctx, *args):
         level = await GDLib.Level.create(' '.join(args))
@@ -161,7 +170,7 @@ class Fun:
     @commands.command(pass_context=True, aliases=["randomsong"], description="Get a random Newgrounds song!", brief='mb!rsong')
     async def rsong(self, ctx):
         while(True):
-            async with aiohttp.ClientSession() as cs:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
                 async with cs.post('https://www.newgrounds.com/audio/browse/sort/date') as r:
                     f = await r.text()
             x = random.randint(0, int(f.split('//www.newgrounds.com/audio/listen/')[1].split('"')[0]))
@@ -181,7 +190,7 @@ class Fun:
     async def rlevel(self, ctx):
         while(True):
             payload = {'gameVersion':'21', 'binaryVersion':'35', 'gdw':'0', 'type':'4', 'str': "", 'diff':'-', 'len':'-', 'page':'0', 'total':'0', 'unCompleted':'0', 'onlycCompleted':'0', 'featured':'0', 'original':'0', 'twoPlayer':'0', 'coins':'0', 'epic':'0', 'demonFilter':'1', 'secret':'Wmfd2893gb7'}
-            async with aiohttp.ClientSession() as cs:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
                 async with cs.post('http://www.boomlings.com/database/getGJLevels21.php', data=payload) as r:
                     f = await r.text()
             x = random.randint(0, int(f.split(':')[1]))
@@ -203,13 +212,15 @@ class Fun:
             emb.add_field(name="Number of Coins", value=str(level.noc))
         await ctx.send(embed=emb)
 
-
     @commands.command(pass_context=True, aliases=["saydelete"], description="Have MewBot say something, then delete your message!", brief='mb!sayd Hello, world!')
     async def sayd(self, ctx, *args):
         try:
-            await ctx.message.delete()
-            await ctx.send(' '.join(args))
-        except:
+            if(args == ()):
+                await ctx.send('You need to enter a message for me to say!')
+            else:
+                await ctx.message.delete()
+                await ctx.send(' '.join(args))
+        except discord.errors.Forbidden:
             await ctx.send("I don't have the `Manage Messages` permission!")
 
     @commands.command(pass_context=True, description="Look at an adorable otter! (Credit to theeo)", brief='mb!otter')
@@ -250,7 +261,10 @@ class Fun:
 
     @commands.command(pass_context=True, description="Have MewBot say something!", brief='mb!say Hello, world!')
     async def say(self, ctx, *args):
-        await ctx.send(' '.join(args))
+        if(args == ()):
+            await ctx.send("You need to enter a message for me to say!")
+        else:
+            await ctx.send(' '.join(args))
 
     @commands.command(pass_context=True, description="Duel someone!", brief='mb!duel @Monstahhh')
     async def duel(self, ctx, user: discord.User=None):
@@ -296,28 +310,31 @@ class Fun:
     @commands.command(pass_context=True, aliases=["suggest", "sg"], description="Suggest something for me to add to MewBot!", brief='mb!sugg There should be ____')
     async def sugg(self, ctx, *args):
         sugg = ' '.join(args)
-        swears = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard', 'bitch', 'biatch', 'bloody', 'blowjob', 'blow', 'bollock', 'bollok', 'boner', 'boob', 'bugger', 'bum', 'butt', 'buttplug', 'clitoris', 'cock', 'coon', 'crap', 'cunt', 'damn', 'dick', 'dildo', 'dyke', 'fag', 'feck', 'fellate', 'fellatio', 'felching', 'fuck', 'fudgepacker', 'packer', 'flange', 'goddamn', 'damn', 'hell', 'homo', 'jerk', 'jizz', 'knobend', 'knob', 'end', 'labia', 'lmao', 'lmfao', 'muff', 'nigger', 'nigga', 'omg', 'penis', 'piss', 'poop', 'porn', 'prick', 'pube', 'pussy', 'queer', 'scrotum', 'sex', 'shit', 'sh1t', 'slut', 'smegma', 'spunk', 'tit', 'tosser', 'turd', 'twat', 'vagina', 'wank', 'whore', 'wtf', 'negro', 'succ', 'retard', 'shiet', 'gay', 'dong', 'killyourself']
-        x = sugg
-        count = 0
-        for i in range(len(swears)):
-            if(swears[i] in ''.join(args)):
-                count += 1
-        with codecs.open("./Resources/Interactive/sugg.txt", "r", encoding="utf8") as f:
-            a = "" if f.read() == "" else f.read().split(" - ")[0].replace('\n', '')
-            if(SequenceMatcher(None, a, sugg).ratio() >= 0.8):
-                count += 1
-        if(count > 0):
-            await ctx.message.channel.send("Your suggestion looked like spam, so it wasn't sent!")
+        if(sugg != "SUGGESTION"):
+            swears = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard', 'bitch', 'biatch', 'bloody', 'blowjob', 'blow', 'bollock', 'bollok', 'boner', 'boob', 'bugger', 'bum', 'butt', 'buttplug', 'clitoris', 'cock', 'coon', 'crap', 'cunt', 'damn', 'dick', 'dildo', 'dyke', 'fag', 'feck', 'fellate', 'fellatio', 'felching', 'fuck', 'fudgepacker', 'packer', 'flange', 'goddamn', 'damn', 'hell', 'homo', 'jerk', 'jizz', 'knobend', 'knob', 'end', 'labia', 'lmao', 'lmfao', 'muff', 'nigger', 'nigga', 'omg', 'penis', 'piss', 'poop', 'porn', 'prick', 'pube', 'pussy', 'queer', 'scrotum', 'sex', 'shit', 'sh1t', 'slut', 'smegma', 'spunk', 'tit', 'tosser', 'turd', 'twat', 'vagina', 'wank', 'whore', 'wtf', 'negro', 'succ', 'retard', 'shiet', 'gay', 'dong', 'killyourself']
+            x = sugg
+            count = 0
+            for i in range(len(swears)):
+                if(swears[i] in ''.join(args)):
+                    count += 1
+            with codecs.open("./Resources/Interactive/sugg.txt", "r", encoding="utf8") as f:
+                a = "" if f.read() == "" else f.read().split(" - ")[0].replace('\n', '')
+                if(SequenceMatcher(None, a, sugg).ratio() >= 0.8):
+                    count += 1
+            if(count > 0):
+                await ctx.message.channel.send("Your suggestion looked like spam, so it wasn't sent!")
+            else:
+                f = codecs.open("./Resources/Interactive/sugg.txt", "a", encoding="utf-8")
+                f.write(x + " - Suggested by " + str(ctx.message.author) + "\n")
+                f.close()
+                me = await self.bot.get_user_info(190804082032640000)
+                emb = (discord.Embed(color=0xf7b8cf))
+                emb.add_field(name=str(ctx.message.author), value=x)
+                emb.timestamp = datetime.datetime.now(pytz.timezone('US/Eastern'))
+                await me.send(embed=emb)
+                await ctx.message.channel.send("Suggestion sent!")
         else:
-            f = codecs.open("./Resources/Interactive/sugg.txt", "a", encoding="utf-8")
-            f.write(x + " - Suggested by " + str(ctx.message.author) + "\n")
-            f.close()
-            me = await self.bot.get_user_info(190804082032640000)
-            emb = (discord.Embed(color=0xf7b8cf))
-            emb.add_field(name=str(ctx.message.author), value=x)
-            emb.set_footer(text="Sent at " + datetime.datetime.now(pytz.timezone('US/Eastern')).strftime("%m-%d-%Y %H:%M:%S") + " EST")
-            await me.send(embed=emb)
-            await ctx.message.channel.send("Suggestion sent!")
+            await ctx.send("No! You have to actually give a suggestion! For example, \"mb!sugg A better help command!\"")
 
 def setup(bot):
     bot.add_cog(Fun(bot))

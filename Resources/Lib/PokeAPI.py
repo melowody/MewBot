@@ -6,7 +6,7 @@ async def savepokemon(bot, ctx):
     pepe = random.choice(z)
     name = ctx.message.author.name
     disc = ctx.message.author.discriminator
-    async with aiohttp.ClientSession() as aioclient:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as aioclient:
         async with aioclient.get(pepe) as r:
             f = await r.read()
     img = Image.open(io.BytesIO(f))

@@ -2,7 +2,7 @@ import asyncio, aiohttp, datetime, math
 
 async def get_player_info(name):
     try:
-        async with aiohttp.ClientSession() as cs:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
             async with cs.get('https://api.hypixel.net/player?key=' + open("C:/TOKENS/HYPIXEL.txt").read() + '&name=' + name) as r:
                 z = await r.json()
             async with cs.get('https://api.mojang.com/users/profiles/minecraft/' + name) as p:
@@ -66,7 +66,7 @@ async def get_player_info(name):
         player.firstlogin = datetime.datetime.fromtimestamp(int(str(out['firstLogin'])[:10]))
         player.lastlogin = datetime.datetime.fromtimestamp(int(str(out['lastLogin'])[:10]))
         uuid = qp['id']
-        async with aiohttp.ClientSession() as cs:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
             async with cs.get("https://api.hypixel.net/friends?key=" + open("C:/TOKENS/HYPIXEL.txt").read() + "&uuid=" + uuid) as r:
                 x = await r.json()
             async with cs.get('https://api.hypixel.net/findGuild?key=' + open("C:/TOKENS/HYPIXEL.txt").read() + '&byUuid=' + uuid) as f:

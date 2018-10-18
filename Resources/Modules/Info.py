@@ -132,7 +132,7 @@ class Info:
         x = list(args)[0]
         cl = TwitchClient(client_id=open("C:/TOKENS/TWITCH.txt"))
         if(not x.isdigit()):
-            async with aiohttp.ClientSession() as cs:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
                 async with cs.get("https://wind-bow.glitch.me/twitch-api/users/" + x) as r:
                     y = await r.read()
             x = str(y).split('_id":')[1].split(',')[0]
@@ -222,7 +222,7 @@ class Info:
         for i in s:
             a = format(ord(i), '#04x').split('0x')[-1]
             url = "http://www.fileformat.info/info/unicode/char/" + a.lower()
-            async with aiohttp.ClientSession() as cs:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
                 async with cs.get(url) as r:
                     f = await r.read()
             f = str(f).split('title>')[1].split('</titl')[0].split("'")[1][:-1]
@@ -250,7 +250,7 @@ class Info:
     @commands.command(pass_context=True, aliases=["ytsearch", "youtubesearch", "youtube"], description="Search YouTube for a video!", brief='mb!ysearch Despacito')
     async def ysearch(self, ctx, *args):
         s = ' '.join(args)
-        async with aiohttp.ClientSession() as cs:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
             async with cs.get('https://www.youtube.com/results?search_query=' + ' '.join(args)) as r:
                 f = await r.read()
             async with cs.get('https://www.youtube.com/watch?v='+ str(f).split('/watch?v=')[1].split('"')[0]) as p:
@@ -290,7 +290,7 @@ class Info:
         av = user.avatar_url
         member = ctx.message.guild.get_member(user_id=user.id)
         username = user.name
-        nick = user.display_name
+        nick = member.nick
         disc = user.discriminator
         stat = str(member.status)
         eyedee = str(user.id)
@@ -304,7 +304,8 @@ class Info:
         emb = (discord.Embed(color=0xf7b8cf))
         emb.set_thumbnail(url=av)
         emb.add_field(name="Username", value=str(username))
-        emb.add_field(name="Nickname", value=nick)
+        if(nick != username):
+            emb.add_field(name="Nickname", value=nick)
         emb.add_field(name="Discriminator (tag)", value=disc)
         emb.add_field(name="Status", value=stat)
         emb.add_field(name="User ID", value=eyedee)

@@ -50,7 +50,7 @@ async def GetImage(client, ctx, args):
         x = args[0]
     else:
         return None
-    async with aiohttp.ClientSession() as aioclient:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as aioclient:
         async with aioclient.get(x) as r:
             f = await r.read()
     if (x.split(".")[-1].split("?")[0].lower() == "webp"):

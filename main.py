@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, sqlite3
+import discord, aiohttp, asyncio, sqlite3, traceback
 from discord.ext.commands import Bot
 from discord.ext import commands
 from discord import *
@@ -28,7 +28,7 @@ async def on_message(message):
     if(user_id in data):
         cprefix = buffer[data.index(user_id)][-1]
         if(message.content.startswith(cprefix) and not message.author.bot):
-            message.content = "mb!" + message.content[len(cprefix):].split()[0].lower() + ' ' + message.content[len(cprefix):].split()[1] if len(message.content[len(cprefix):].split()) != 1 else "mb!" + message.content[len(cprefix):].split()[0].lower()
+            message.content = "mb!" + message.content[len(cprefix):].split()[0].lower() + ' ' + ' '.join(message.content[len(cprefix):].split()[1:]) if len(message.content[len(cprefix):].split()) != 1 else "mb!" + message.content[len(cprefix):].split()[0].lower()
             game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
             await client.change_presence(activity=game)
             payload = {"server_count": str(len(client.guilds))}
@@ -57,6 +57,21 @@ async def on_message(message):
                 await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("C:/TOKENS/DBL.txt").read()})
                 await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data={"guilds": len(client.guilds), "users": x}, headers={"Authorization": open("C:/TOKENS/DBL2.txt").read()})
             await client.process_commands(message)
+
+@client.event
+async def on_command_error(ctx, error):
+    x = traceback.format_exception_only(type(error), error)[0]
+    y = traceback.format_exception(type(error), error, error.__traceback__)
+    if(isinstance(error, commands.CommandNotFound)):
+        pass
+    else:
+        await ctx.send("It seems an error has occured. Use mb!sugg to tell me about it!")
+        venom = client.get_user(190804082032640000)
+        emb = (discord.Embed(color=0xff0000))
+        emb.set_author(name="ERROR")
+        emb.add_field(name="Command", value=ctx.message.content)
+        emb.add_field(name="Traceback", value='```' + ''.join(y).split('The above exception was the direct cause')[0][:900] + '```')
+        await venom.send(embed=emb)
 
 extensions = ["Resources.Modules.Fun", "Resources.Modules.Encryption", "Resources.Modules.Money", "Resources.Modules.Info", "Resources.Modules.Mod"]
 
