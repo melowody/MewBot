@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, datetime, time, re, html, codecs, whois as wis, sqlite3, pycountry
+import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry
 from discord.ext import commands
 from mcstatus import MinecraftServer
 from twitch import TwitchClient
@@ -18,15 +18,15 @@ class Info:
         self.bot = bot
 
     @commands.command(pass_context=True, description="The help command!", brief="mb!help")
-    async def help(self, ctx, *args):
-        conn = sqlite3.connect('./Resources/Interactive/Prefixes.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM Prefixes")
+    async def help(self, ctx, *, args):
+        args = args.split()
+        async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
+            c = await conn.execute("SELECT * FROM Prefixes")
+            buffer = await c.fetchall()
+            await c.close()
+            await conn.close()
         user_id = ctx.message.author.id
-        buffer = c.fetchall()
         data = [i[0] for i in buffer]
-        c.close()
-        conn.close()
         prefix = "mb!"
         p = -1
         for j in range(len(data)):
@@ -35,7 +35,7 @@ class Info:
                 p = j
         if(p != -1):
             prefix = buffer[p][-1]
-        if(args != ()):
+        if(args != []):
             cmd = args[0]
             x = self.bot.get_command(cmd)
             emb = (discord.Embed(color=0xf7b8cf))
@@ -128,8 +128,8 @@ class Info:
         await ctx.send("There are " + str(statushow.players.online) + " people on " + host)
 
     @commands.command(pass_context=True, aliases=["twitchchannel"], description="Get the info on a twitch streamer!", brief='mb!twitch CarlSagan42')
-    async def twitch(self, ctx, *args):
-        x = list(args)[0]
+    async def twitch(self, ctx, *, args):
+        x = args.split()[0]
         cl = TwitchClient(client_id=open("C:/TOKENS/TWITCH.txt"))
         if(not x.isdigit()):
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
@@ -174,9 +174,8 @@ class Info:
             await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Get the info on a Geometry Dash level!", brief='mb!level Windy Landscape')
-    async def level(self, ctx, *args):
-        s = ' '.join(args)
-        level = await GDLib.Level.create(s)
+    async def level(self, ctx, *, args):
+        level = await GDLib.Level.create(args)
         emb = (discord.Embed(color=0xf7b8cf))
         emb.set_author(name="Level Info")
         emb.add_field(name="Level Name", value=level.title)
@@ -215,24 +214,9 @@ class Info:
         emb.add_field(name="Library", value="discord.py")
         await ctx.send(embed=emb)
 
-    @commands.command(pass_context=True, aliases=["char"], description="Get information on the characters you type!", brief='mb!character Р')
-    async def character(self, ctx, *args):
-        s = list(' '.join(args))
-        fin = ""
-        for i in s:
-            a = format(ord(i), '#04x').split('0x')[-1]
-            url = "http://www.fileformat.info/info/unicode/char/" + a.lower()
-            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
-                async with cs.get(url) as r:
-                    f = await r.read()
-            f = str(f).split('title>')[1].split('</titl')[0].split("'")[1][:-1]
-            fin = fin + '`\\U000000' + a.lower() + '`: **' + f + '** - ' + i + ' — ' + url + "\n"
-        await ctx.send(fin)
-
     @commands.command(pass_context=True, description="Get the information on a Geometry Dash player!", brief='mb!gdprof RobTop')
-    async def gdprof(self, ctx, *args):
-        name = ' '.join(args)
-        user = await GDLib.User.create(name)
+    async def gdprof(self, ctx, *, args):
+        user = await GDLib.User.create(args)
         emb = (discord.Embed(color=0xf7b8cf))
         emb.set_author(name=name)
         emb.add_field(name="Rank", value=user.rank)
@@ -248,10 +232,9 @@ class Info:
 
 
     @commands.command(pass_context=True, aliases=["ytsearch", "youtubesearch", "youtube"], description="Search YouTube for a video!", brief='mb!ysearch Despacito')
-    async def ysearch(self, ctx, *args):
-        s = ' '.join(args)
+    async def ysearch(self, ctx, *, args):
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
-            async with cs.get('https://www.youtube.com/results?search_query=' + ' '.join(args)) as r:
+            async with cs.get('https://www.youtube.com/results?search_query=' + args) as r:
                 f = await r.read()
             async with cs.get('https://www.youtube.com/watch?v='+ str(f).split('/watch?v=')[1].split('"')[0]) as p:
                 page = await p.read()
@@ -270,13 +253,13 @@ class Info:
         emb.add_field(name="Likes", value=likes)
         emb.add_field(name="Dislikes", value=dislikes)
         emb.add_field(name="Description", value=desc[:100].encode().decode('utf-8'))
-        print(thumbnail)
         emb.set_image(url="https:" + thumbnail if not thumbnail.startswith("https:") else thumbnail)
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["user"], description="Get the information on a discord user!", brief='mb!userinfo @Zpicy')
-    async def userinfo(self, ctx, *args):
-        if(args == ()):
+    async def userinfo(self, ctx, *, args):
+        args = args.split()
+        if(args == []):
             user = self.bot.get_user(ctx.message.author.id)
         elif (args[0][:2] == "<@" and args[0][-1] == ">"):
             if (args[0][:3] == "<@!"):
@@ -351,36 +334,40 @@ class Info:
         lose = []
         for i in skins:
             emb = (discord.Embed(color=0xf7b8cf))
-            emb.set_author(name=i)
+            emb.set_author(name=i.replace("\\'", "'").replace("\\xe5\\xbc\\x90", "弐").replace("\\xe5\\xa3\\xb1", "壱").replace('\\xe9\\xbe\\x8d\\xe7\\x8e\\x8b', "龍王"))
             lose.append(emb)
-        q2 = await ctx.send('Which Skin will you choose?')
-        y = await Paginator.ReactionPaginator(self.bot, ctx.message, lose)
-        await q2.delete()
-        q3 = await ctx.send('Which Wear will you choose?')
-        lof = ["Factory New", "Minimal Wear", "Field-Tested", "Well-Worn", "Battle-Scarred"]
-        lofe = []
-        for i in lof:
-            emb = (discord.Embed(color=0xf7b8cf))
-            emb.set_author(name=i)
-            lofe.append(emb)
-        z = await Paginator.ReactionPaginator(self.bot, ctx.message, lofe)
-        await q3.delete()
-        loc = ["StatTrak", "Souvenir", "None"]
-        loce = []
-        for i in loc:
-            emb = (discord.Embed(color=0xf7b8cf))
-            emb.set_author(name=i)
-            loce.append(emb)
-        q4 = await ctx.send("StatTrak, Souvenir, or None?")
-        a = await Paginator.ReactionPaginator(self.bot, ctx.message, loce)
-        await q4.delete()
-        stattrak = a.author.name == "StatTrak"
-        souvenir = a.author.name == "Souvenir"
-        skin = await CSGOLib.WeaponSkin.create(x.author.name, y.author.name, z.author.name, stattrak=stattrak, souvenir=souvenir)
-        emb = (discord.Embed(color=0xf7b8cf))
-        emb.set_author(name=("StatTrak™ " if stattrak else "") + ("Souvenir " if souvenir else "") + x.author.name + " | " + y.author.name + " (" + z.author.name + ")")
-        emb.add_field(name="Price", value=(("$" + str(skin.price)) if skin.price != 0 else "This skin doesn't exist"))
-        await ctx.send(embed=emb)
+        if(x):
+            q2 = await ctx.send('Which Skin will you choose?')
+            y = await Paginator.ReactionPaginator(self.bot, ctx.message, lose)
+            await q2.delete()
+            if(y):
+                q3 = await ctx.send('Which Wear will you choose?')
+                lof = ["Factory New", "Minimal Wear", "Field-Tested", "Well-Worn", "Battle-Scarred"]
+                lofe = []
+                for i in lof:
+                    emb = (discord.Embed(color=0xf7b8cf))
+                    emb.set_author(name=i)
+                    lofe.append(emb)
+                z = await Paginator.ReactionPaginator(self.bot, ctx.message, lofe)
+                await q3.delete()
+                if(z):
+                    loc = ["StatTrak", "Souvenir", "None"]
+                    loce = []
+                    for i in loc:
+                        emb = (discord.Embed(color=0xf7b8cf))
+                        emb.set_author(name=i)
+                        loce.append(emb)
+                    q4 = await ctx.send("StatTrak, Souvenir, or None?")
+                    a = await Paginator.ReactionPaginator(self.bot, ctx.message, loce)
+                    await q4.delete()
+                    if(a):
+                        stattrak = a.author.name == "StatTrak"
+                        souvenir = a.author.name == "Souvenir"
+                        skin = await CSGOLib.WeaponSkin.create(x.author.name, y.author.name, z.author.name, stattrak=stattrak, souvenir=souvenir)
+                        emb = (discord.Embed(color=0xf7b8cf))
+                        emb.set_author(name=("StatTrak™ " if stattrak else "") + ("Souvenir " if souvenir else "") + x.author.name + " | " + y.author.name + " (" + z.author.name + ")")
+                        emb.add_field(name="Price", value=(("$" + str(skin.price)) if skin.price != 0 else "This skin doesn't exist"))
+                        await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["hypixel", "hypixels", "hstats", "hypixelstats"], description="Get the stats of a player on Hypixel!", brief='mb!hs pigpatty')
     async def hs(self, ctx, name):

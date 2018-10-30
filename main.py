@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, sqlite3, traceback
+import discord, aiohttp, asyncio, aiosqlite, traceback
 from discord.ext.commands import Bot
 from discord.ext import commands
 from discord import *
@@ -17,14 +17,13 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    conn = sqlite3.connect('./Resources/Interactive/Prefixes.db')
-    c = conn.cursor()
-    c.execute("SELECT * FROM Prefixes")
+    async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
+        c = await conn.execute("SELECT * FROM Prefixes")
+        buffer = await c.fetchall()
+        await c.close()
+        await conn.close()
     user_id = message.author.id
-    buffer = c.fetchall()
     data = [i[0] for i in buffer]
-    c.close()
-    conn.close()
     if(user_id in data):
         cprefix = buffer[data.index(user_id)][-1]
         if(message.content.startswith(cprefix) and not message.author.bot):
@@ -64,13 +63,15 @@ async def on_command_error(ctx, error):
     y = traceback.format_exception(type(error), error, error.__traceback__)
     if(isinstance(error, commands.CommandNotFound)):
         pass
+    elif(isinstance(error, discord.ext.commands.errors.MissingRequiredArgument)):
+        await ctx.send("It seems that you have not put in all the required arguments!")
     else:
         await ctx.send("It seems an error has occured. Use mb!sugg to tell me about it!")
         venom = client.get_user(190804082032640000)
         emb = (discord.Embed(color=0xff0000))
         emb.set_author(name="ERROR")
         emb.add_field(name="Command", value=ctx.message.content)
-        emb.add_field(name="Traceback", value='```' + ''.join(y).split('The above exception was the direct cause')[0][:900] + '```')
+        emb.add_field(name="Traceback", value='```' + ''.join(y).split('The above exception was the direct cause')[0][:1000] + '```')
         await venom.send(embed=emb)
 
 extensions = ["Resources.Modules.Fun", "Resources.Modules.Encryption", "Resources.Modules.Money", "Resources.Modules.Info", "Resources.Modules.Mod"]

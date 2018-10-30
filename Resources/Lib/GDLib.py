@@ -99,7 +99,7 @@ async def get_level_pass(lid):
         payload = {'gameVersion':'21', 'binaryVersion':'35', 'gdw':'0', 'levelID': lid, 'inc': '1', 'extras': '0', 'secret':'Wmfd2893gb7'}
         async with cs.post('http://www.boomlings.com/database/downloadGJLevel22.php', data=payload) as r:
             f = await r.text()
-    return rted(f.split(':')[-1].split('#')[0])[1:] if f.split(':')[-1].split('#')[0] != "0" and f.split(':')[-1].split('#')[0] != "10" and f.split(':')[-1].split('#')[0] != "1" else 0
+    return rted(f.split(':')[-1].split('#')[0])[1:] if f.split(':')[-1].split('#')[0] != "0" and f.split(':')[-1].split('#')[0] != "10" and f.split(':')[-1].split('#')[0] != "1" and f.split(':')[-1].split('#')[0] != "" else 0
 
 async def get_level_info(inp):
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:

@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, os, sqlite3, PIL.ImageOps
+import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, os, aiosqlite, PIL.ImageOps
 from googletrans import Translator
 from PIL import Image
 from difflib import SequenceMatcher
@@ -9,9 +9,9 @@ class Fun:
         self.bot = bot
 
     @commands.command(pass_context=True, description="Convert to small letters!", brief="mb!smallletter Hello, world!")
-    async def smallletter(self, ctx, *args):
+    async def smallletter(self, ctx, *, args):
         sl = {'q': 'ᵠ', 'w': 'ʷ', 'e': 'ᵉ', 'r': 'ʳ', 't': 'ᵗ', 'y': 'ʸ', 'u': 'ᵘ', 'i': 'ᶦ', 'o': 'ᵒ', 'p': 'ᵖ', 'a': 'ᵃ', 's': 'ˢ', 'd': 'ᵈ', 'f': 'ᶠ', 'g': 'ᵍ', 'h': 'ʰ', 'j': 'ʲ', 'k': 'ᵏ', 'l': 'ˡ', 'z': 'ᶻ', 'x': 'ˣ', 'c': 'ᶜ', 'v': 'ᵛ', 'b': 'ᵇ', 'n': 'ⁿ', 'm': 'ᵐ', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '0': '⁰'}
-        args = ' '.join(args).split()
+        args = args.split()
         for i in range(len(args)):
             j = args[i]
             fin = ""
@@ -27,84 +27,90 @@ class Fun:
             
 
     @commands.command(pass_context=True, description="Invert an image!", brief="mb!invert @hellosarina")
-    async def invert(self, ctx, *args):
-        im = await ImgLib.GetImage(self.bot, ctx, args)
-        im = im.convert('RGB')
-        img = PIL.ImageOps.invert(im)
-        output_buffer = io.BytesIO()
-        img.save(output_buffer, "png")
-        output_buffer.seek(0)
-        await ctx.send(file=discord.File(output_buffer, filename="invert.png"))
+    async def invert(self, ctx, *, args):
+        try:
+            args = args.split()
+            im = await ImgLib.GetImage(self.bot, ctx, args)
+            if(im):
+                im = im.convert('RGB')
+                img = PIL.ImageOps.invert(im)
+                output_buffer = io.BytesIO()
+                img.save(output_buffer, "png")
+                output_buffer.seek(0)
+                await ctx.send(file=discord.File(output_buffer, filename="invert.png"))
+            else:
+                raise AttributeError("Not Valid.")
+        except (AttributeError, OSError):
+            await ctx.send("That is not a valid image or user!")
 
     @commands.command(pass_context=True, description="Set the prefix that you'll use!", brief='mb!setprefix m!')
-    async def setprefix(self, ctx, *args):
-        prefix = ' '.join(args)
-        conn = sqlite3.connect('./Resources/Interactive/Prefixes.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM Prefixes")
-        user_id = ctx.message.author.id
-        data = [i[0] for i in c.fetchall()]
-        if(user_id in data):
-            c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (prefix, user_id))
-            conn.commit()
-            c.close()
-            conn.close()
-        else:
-            c.execute("INSERT INTO Prefixes VALUES(?, ?)", (user_id, prefix))
-            conn.commit()
-            c.close()
-            conn.close()
-        await ctx.send("Prefix set to ***__" + prefix + "__***!")
+    async def setprefix(self, ctx, *, args):
+        async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
+            c = await conn.execute("SELECT * FROM Prefixes")
+            user_id = ctx.message.author.id
+            data = [i[0] for i in await c.fetchall()]
+            if(user_id in data):
+                await c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (args, user_id))
+                await conn.commit()
+                await c.close()
+                await conn.close()
+            else:
+                await c.execute("INSERT INTO Prefixes VALUES(?, ?)", (user_id, args))
+                await conn.commit()
+                await c.close()
+                await conn.close()
+        await ctx.send("Prefix set to ***__" + args + "__***!")
 
     @commands.command(pass_context=True, aliases=["8ball", "8b"], description="Try your luck with the 8ball!", brief='mb!8ball Is MewBot any good?')
-    async def eightball(self, ctx, *args):
-        message = ' '.join(args)
+    async def eightball(self, ctx, *, args):
         out = ""
-        out += ":8ball: " + str(ctx.message.author.mention) + ": " + message + "\nMy Response: " + random.choice(["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no", "Outlook not so good.", "Very doubtful"])
+        out += ":8ball: " + str(ctx.message.author.mention) + ": " + args + "\nMy Response: " + random.choice(["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no", "Outlook not so good.", "Very doubtful"])
         await ctx.send(out)
 
     @commands.command(pass_context=True, aliases=["whosthatpokemon"], description="Play a game of Who's That Pokemon!", brief='mb!wtp')
-    async def wtp(self, ctx, *args):
-        if(args == ()):
+    async def wtp(self, ctx, *, args):
+        if(args == ""):
             await ctx.message.channel.trigger_typing()
-            conn = sqlite3.connect('./Resources/Interactive/WTP.db')
-            c = conn.cursor()
-            c.execute('SELECT * FROM WTP')
-            data = c.fetchall()
-            iii = False
-            for i in data:
-                if(ctx.message.channel.id in i):
-                    iii = True
-            x = await PokeAPI.savepokemon(self.bot, ctx)
-            file = x[0]
-            output_buffer = io.BytesIO()
-            file.save(output_buffer, "png")
-            output_buffer.seek(0)
-            await ctx.send(file=discord.File(output_buffer, filename="WTP.png"))
-            if(not iii):
-                c.execute("INSERT INTO WTP VALUES(?, ?)", (ctx.message.channel.id, x[1].replace('_', ' ').replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')))
-            else:
-                c.execute("UPDATE WTP SET Pokemon=? WHERE Channel=?", (x[1].replace('_', ' ').replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', ''), ctx.message.channel.id))
-            conn.commit()
-        else:
-            p = ' '.join(args).replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')
-            conn = sqlite3.connect('./Resources/Interactive/WTP.db')
-            c = conn.cursor()
-            c.execute('SELECT * FROM WTP')
-            data = c.fetchall()
-            cpok = ""
-            for i in data:
-                if(i[0] == ctx.message.channel.id):
-                    cpok = i[1]
-            if(cpok == ""):
-                await ctx.send("There isn't a game yet! Type mb!wtp to get one started!")
-            else:
-                if(cpok.lower() == p.lower()):
-                    await ctx.send("You got it!")
-                    c.execute("UPDATE WTP SET Pokemon=? WHERE Channel=?", ("", str(ctx.message.channel.id)))
-                    conn.commit()
+            async with aiosqlite.connect('./Resources/Interactive/WTP.db') as conn:
+                c = await conn.execute("SELECT * FROM WTP")
+                data = await c.fetchall()
+                iii = False
+                for i in data:
+                    if(ctx.message.channel.id in i):
+                        iii = True
+                x = await PokeAPI.savepokemon(self.bot, ctx)
+                file = x[0]
+                output_buffer = io.BytesIO()
+                file.save(output_buffer, "png")
+                output_buffer.seek(0)
+                await ctx.send(file=discord.File(output_buffer, filename="WTP.png"))
+                if(not iii):
+                    await c.execute("INSERT INTO WTP VALUES(?, ?)", (ctx.message.channel.id, x[1].replace('_', ' ').replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')))
                 else:
-                    await ctx.send("That's not quite right, try again!")
+                    await c.execute("UPDATE WTP SET Pokemon=? WHERE Channel=?", (x[1].replace('_', ' ').replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', ''), ctx.message.channel.id))
+                await conn.commit()
+                await c.close()
+                await conn.close()
+        else:
+            p = args.replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')
+            async with aiosqlite.connect('./Resources/Interactive/WTP.db') as conn:
+                c = await conn.execute('SELECT * FROM WTP')
+                data = await c.fetchall()
+                cpok = ""
+                for i in data:
+                    if(i[0] == ctx.message.channel.id):
+                        cpok = i[1]
+                if(cpok == ""):
+                    await ctx.send("There isn't a game yet! Type mb!wtp to get one started!")
+                else:
+                    if(cpok.lower() == p.lower()):
+                        await ctx.send("You got it!")
+                        await c.execute("UPDATE WTP SET Pokemon=? WHERE Channel=?", ("", str(ctx.message.channel.id)))
+                        await conn.commit()
+                    else:
+                        await ctx.send("That's not quite right, try again!")
+                await c.close()
+                await conn.close()
 
     @commands.command(pass_context=True, aliases=["shibe", "shiba", "shibainu", "inu"], description="Look at an adorable shibe!", brief='mb!shibe')
     async def shib(self, ctx):
@@ -139,17 +145,20 @@ class Fun:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Translate a from one language to another!", brief='mb!translate en de Hello, world!')
-    async def translate(self, ctx, lf, lt, *args):
-        x = Translator()
-        out = x.translate(' '.join(args), src=lf, dest=lt)
-        emb = (discord.Embed(color=0xf7b8cf))
-        emb.set_author(name="Google Translate")
-        emb.add_field(name=lf + " -> " + lt, value=out.text)
-        await ctx.send(embed=emb)
+    async def translate(self, ctx, lf, lt, *, args):
+        try:
+            x = Translator()
+            out = x.translate(args, src=lf, dest=lt)
+            emb = (discord.Embed(color=0xf7b8cf))
+            emb.set_author(name="Google Translate")
+            emb.add_field(name=lf + " -> " + lt, value=out.text)
+            await ctx.send(embed=emb)
+        except ValueError:
+            await ctx.send("You put an invalid source or destination language!")
 
     @commands.command(pass_context=True, aliases=["levelpass"], description="Get the password of a Geometry Dash level!", brief='mb!lpass Cataclysm')
-    async def lpass(self, ctx, *args):
-        level = await GDLib.Level.create(' '.join(args))
+    async def lpass(self, ctx, *, args):
+        level = await GDLib.Level.create(args)
         if(level.password != 0):
             emb = (discord.Embed(color=0xf7b8cf))
             emb.set_author(name=level.title)
@@ -159,7 +168,8 @@ class Fun:
             await ctx.send("There is no pass for the level __**" + level.title + "**__.")
 
     @commands.command(pass_context=True, aliases=["blurplefy"], description="Blurplefy an image!", brief='mb!blurple https://bit.ly/2RuKIDr')
-    async def blurple(self, ctx, *args):
+    async def blurple(self, ctx, *, args):
+        args = args.split()
         im = await ImgLib.GetImage(self.bot, ctx, args)
         im = await ImgLib.Blurplefy(im)
         output_buffer = io.BytesIO()
@@ -213,13 +223,13 @@ class Fun:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["saydelete"], description="Have MewBot say something, then delete your message!", brief='mb!sayd Hello, world!')
-    async def sayd(self, ctx, *args):
+    async def sayd(self, ctx, *, args):
         try:
             if(args == ()):
                 await ctx.send('You need to enter a message for me to say!')
             else:
                 await ctx.message.delete()
-                await ctx.send(' '.join(args))
+                await ctx.send(args)
         except discord.errors.Forbidden:
             await ctx.send("I don't have the `Manage Messages` permission!")
 
@@ -229,7 +239,8 @@ class Fun:
         await ctx.message.channel.send(str(ctx.message.author.mention) + ", Here is your otter\n" + random.choice(o))
 
     @commands.command(pass_context=True, aliases=["deepfry"], description="Deepfry an image!", brief='mb!df https://bit.ly/2RuKIDr')
-    async def df(self, ctx, *args):
+    async def df(self, ctx, *, args):
+        args = args.split()
         im = await ImgLib.GetImage(self.bot, ctx, args)
         if(im):
             factor = (259 * (255 + 255)) / (255 * (259 - 255))
@@ -244,8 +255,8 @@ class Fun:
             await ctx.send("Image Not Found!")
 
     @commands.command(pass_context=True, aliases=["emoji"], description="Turn a message into big letters!", brief='mb!bigletter Hello, world!')
-    async def bigletter(self, ctx, *args):
-        f = list(' '.join(args))
+    async def bigletter(self, ctx, *, args):
+        f = list(args)
         fin = ""
         for i in f:
             i = i.lower()
@@ -260,11 +271,11 @@ class Fun:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Have MewBot say something!", brief='mb!say Hello, world!')
-    async def say(self, ctx, *args):
+    async def say(self, ctx, *, args):
         if(args == ()):
             await ctx.send("You need to enter a message for me to say!")
         else:
-            await ctx.send(' '.join(args))
+            await ctx.send(args)
 
     @commands.command(pass_context=True, description="Duel someone!", brief='mb!duel @Monstahhh')
     async def duel(self, ctx, user: discord.User=None):
@@ -288,10 +299,21 @@ class Fun:
             await ctx.send("You can't duel no one! Tag someone!")
 
     @commands.command(pass_context=True, description="Jeff someone!", brief='mb!jeff @File_34')
-    async def jeff(self, ctx, user: discord.User=None):
-        if(user):
-            await ctx.send(file=discord.File(open("./Resources/Sources/jeff.jpg", "rb"), filename="jeff.jpg"))
-            await ctx.send(str(user.mention) + ", You just got jeff'd by " + str(ctx.message.author.mention))
+    async def jeff(self, ctx, *, args):
+        if(args):
+            u = args.split()[0]
+            user = None
+            if((u.startswith('<@') or u.isdigit()) and u.split('<@')[-1].split('>')[0].isdigit()):
+                try:
+                    user = await self.bot.get_user_info(int(u.split('<@')[-1].split('>')[0]))
+                except discord.errors.NotFound:
+                    await ctx.send("That is not a valid user, so I can't jeff them!")
+                    return
+            if(user):
+                await ctx.send(file=discord.File(open("./Resources/Sources/jeff.jpg", "rb"), filename="jeff.jpg"))
+                await ctx.send(str(user.mention) + ", You just got jeff'd by " + str(ctx.message.author.mention))
+            else:
+                await ctx.send("You have to mention someone to jeff them!")
         else:
             await ctx.send("You can't jeff yourself! Tag someone!")
 
@@ -308,18 +330,17 @@ class Fun:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["suggest", "sg"], description="Suggest something for me to add to MewBot!", brief='mb!sugg There should be ____')
-    async def sugg(self, ctx, *args):
-        sugg = ' '.join(args)
-        if(sugg != "SUGGESTION"):
+    async def sugg(self, ctx, *, args):
+        if(args != "SUGGESTION"):
             swears = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard', 'bitch', 'biatch', 'bloody', 'blowjob', 'blow', 'bollock', 'bollok', 'boner', 'boob', 'bugger', 'bum', 'butt', 'buttplug', 'clitoris', 'cock', 'coon', 'crap', 'cunt', 'damn', 'dick', 'dildo', 'dyke', 'fag', 'feck', 'fellate', 'fellatio', 'felching', 'fuck', 'fudgepacker', 'packer', 'flange', 'goddamn', 'damn', 'hell', 'homo', 'jerk', 'jizz', 'knobend', 'knob', 'end', 'labia', 'lmao', 'lmfao', 'muff', 'nigger', 'nigga', 'omg', 'penis', 'piss', 'poop', 'porn', 'prick', 'pube', 'pussy', 'queer', 'scrotum', 'sex', 'shit', 'sh1t', 'slut', 'smegma', 'spunk', 'tit', 'tosser', 'turd', 'twat', 'vagina', 'wank', 'whore', 'wtf', 'negro', 'succ', 'retard', 'shiet', 'gay', 'dong', 'killyourself']
-            x = sugg
+            x = args
             count = 0
             for i in range(len(swears)):
                 if(swears[i] in ''.join(args)):
                     count += 1
             with codecs.open("./Resources/Interactive/sugg.txt", "r", encoding="utf8") as f:
                 a = "" if f.read() == "" else f.read().split(" - ")[0].replace('\n', '')
-                if(SequenceMatcher(None, a, sugg).ratio() >= 0.8):
+                if(SequenceMatcher(None, a, args).ratio() >= 0.8):
                     count += 1
             if(count > 0):
                 await ctx.message.channel.send("Your suggestion looked like spam, so it wasn't sent!")

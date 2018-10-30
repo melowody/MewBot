@@ -19,12 +19,20 @@ class Mod:
             await ctx.send("You're not allowed.")
 
     @commands.command(pass_context=True, description="ADMIN: Kick someone from your server!", brief='mb!kick @Lemon')
-    async def kick(self, ctx, user: discord.User):
+    async def kick(self, ctx, *, args):
+        args = args.split()
         if(ctx.message.author.guild_permissions.kick_members):
-            n = user.name
-            d = user.discriminator
-            await ctx.message.guild.kick(user)
-            await ctx.send("Kicked " + str(n) + "#" + str(d) + "!")
+            try:
+                if(args[0].startswith('<@') and args[0].endswith('>')):
+                    user = await self.bot.get_user_info(int(args[0].split('@')[1].split('>')[0]))
+                elif(args[0].isdigit()):
+                    user = await self.bot.get_user_info(int(args[0]))
+                n = user.name
+                d = user.discriminator
+                await ctx.message.guild.kick(user)
+                await ctx.send("Kicked " + str(n) + "#" + str(d) + "!")
+            except:
+                await ctx.send("That is not a valid user!")
 
     @commands.command(pass_context=True, description="ADMIN: Ban someone from your server!", brief='mb!ban @Orange')
     async def ban(self, ctx, user: discord.User):

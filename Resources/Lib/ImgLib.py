@@ -38,14 +38,17 @@ async def GetImage(client, ctx, args):
             y = args[0].split("<@!")[1].split(">")[0]
         else:
             y = args[0].split("<@")[1].split(">")[0]
-        x = await client.get_user_info(y)
+        try:
+            x = await client.get_user_info(y)
+        except discord.errors.NotFound:
+            return None
         x = x.avatar_url
     elif (args[0].isdigit()):
         try:
             x = await client.get_user_info(int(args[0]))
-            x = x.avatar_url
-        except:
+        except discord.errors.NotFound:
             return None
+        x = x.avatar_url
     elif (args[0].startswith('http')):
         x = args[0]
     else:

@@ -18,11 +18,11 @@ async def DemonlistPaginator(client, message):
             return False
 
     def check(m):
-        return isNum(m.content) and m.author == message.author and m.channel == message.channel
+        return m.content.isdigit() and m.author == message.author and m.channel == message.channel
 
     while(True):
         def change(reaction, user):
-            return user == message.author
+            return user == message.author and reaction.message.id == botmsg.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
@@ -77,13 +77,12 @@ async def ReactionPaginator(client, message, x):
     await botmsg.add_reaction("\U00002705")
     while(True):
         def change(reaction, user):
-            return user == message.author
-
+            return user == message.author and reaction.message.id == botmsg.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
             await botmsg.delete()
-            break
+            return None
         else:
             if(str(reaction.emoji) == "▶"):
                 try:
@@ -123,8 +122,7 @@ async def PaginatorNoSkip(client, message, x):
     await botmsg.add_reaction("⏹")
     while(True):
         def change(reaction, user):
-            return user == message.author
-
+            return user == message.author and reaction.message.id == botmsg.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
@@ -171,8 +169,7 @@ async def Paginator(client, message, x):
     await botmsg.add_reaction("\U0001F522")
     while(True):
         def change(reaction, user):
-            return user == message.author
-
+            return user == message.author and reaction.message.id == botmsg.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=change)
         except futures.TimeoutError:
