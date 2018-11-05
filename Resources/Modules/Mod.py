@@ -19,8 +19,7 @@ class Mod:
             await ctx.send("You're not allowed.")
 
     @commands.command(pass_context=True, description="ADMIN: Kick someone from your server!", brief='mb!kick @Lemon')
-    async def kick(self, ctx, *, args):
-        args = args.split()
+    async def kick(self, ctx, *args):
         if(ctx.message.author.guild_permissions.kick_members):
             try:
                 if(args[0].startswith('<@') and args[0].endswith('>')):

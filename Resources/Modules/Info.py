@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry
+import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.MKWLib as MKWLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry
 from discord.ext import commands
 from mcstatus import MinecraftServer
 from twitch import TwitchClient
@@ -17,9 +17,25 @@ class Info:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(pass_context=True, description="Get the top time for an MKW course!", brief="mb!mkwtop COURSE", aliases=["mkw", "ctgp", "top", "ctgptop", "mariokartwii", "mariokartwiitop", "customtrackgrandprix", "customtrackgrandprixtop"])
+    async def mkwtop(self, ctx, *args):
+        await ctx.message.channel.trigger_typing()
+        x = await MKWLib.get_top(self.bot, ctx.message, ' '.join(args))
+        if(x != 0):
+            emb = (discord.Embed(color=0xf7b8cf))
+            emb.set_author(name=x[0])
+            emb.add_field(name="Player", value=x[2])
+            emb.add_field(name="Time", value=x[1])
+            emb.add_field(name="Country", value=x[3])
+            emb.add_field(name="Controller", value=x[4])
+            emb.add_field(name="Character/Vehicle Combo", value=x[5] + ' - ' + x[6])
+            emb.add_field(name="Time Set", value=x[7])
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send("This track does not exist!")
+
     @commands.command(pass_context=True, description="The help command!", brief="mb!help")
-    async def help(self, ctx, *, args):
-        args = args.split()
+    async def help(self, ctx, *args):
         async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
             c = await conn.execute("SELECT * FROM Prefixes")
             buffer = await c.fetchall()
@@ -35,17 +51,20 @@ class Info:
                 p = j
         if(p != -1):
             prefix = buffer[p][-1]
-        if(args != []):
-            cmd = args[0]
-            x = self.bot.get_command(cmd)
-            emb = (discord.Embed(color=0xf7b8cf))
-            emb.add_field(name=prefix + x.name, value=x.description)
-            emb.add_field(name="Usage", value='`' + x.brief.replace('mb!', prefix) + '`' if not x.brief.startswith('`') else x.brief.replace('mb!', prefix))
-            if(x.aliases != []):
-                emb.set_footer(text="Aliases: " + ', '.join(x.aliases))
-            else:
-                emb.set_footer(text="Aliases: None")
-            await ctx.send(embed=emb)
+        if(args != ()):
+            try:
+                cmd = args[0]
+                x = self.bot.get_command(cmd)
+                emb = (discord.Embed(color=0xf7b8cf))
+                emb.add_field(name=prefix + x.name, value=x.description)
+                emb.add_field(name="Usage", value='`' + x.brief.replace('mb!', prefix) + '`' if not x.brief.startswith('`') else x.brief.replace('mb!', prefix))
+                if(x.aliases != []):
+                    emb.set_footer(text="Aliases: " + ', '.join(x.aliases))
+                else:
+                    emb.set_footer(text="Aliases: None")
+                await ctx.send(embed=emb)
+            except AttributeError:
+                await ctx.send("It seems that is not a valid command! Type mb!help for a list of all commands!")
         else:
             cmds = list(self.bot.commands)
             loe = []
@@ -128,8 +147,8 @@ class Info:
         await ctx.send("There are " + str(statushow.players.online) + " people on " + host)
 
     @commands.command(pass_context=True, aliases=["twitchchannel"], description="Get the info on a twitch streamer!", brief='mb!twitch CarlSagan42')
-    async def twitch(self, ctx, *, args):
-        x = args.split()[0]
+    async def twitch(self, ctx, *args):
+        x = args[0]
         cl = TwitchClient(client_id=open("C:/TOKENS/TWITCH.txt"))
         if(not x.isdigit()):
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
@@ -174,8 +193,8 @@ class Info:
             await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Get the info on a Geometry Dash level!", brief='mb!level Windy Landscape')
-    async def level(self, ctx, *, args):
-        level = await GDLib.Level.create(args)
+    async def level(self, ctx, *args):
+        level = await GDLib.Level.create(' '.join(args))
         emb = (discord.Embed(color=0xf7b8cf))
         emb.set_author(name="Level Info")
         emb.add_field(name="Level Name", value=level.title)
@@ -215,10 +234,10 @@ class Info:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Get the information on a Geometry Dash player!", brief='mb!gdprof RobTop')
-    async def gdprof(self, ctx, *, args):
-        user = await GDLib.User.create(args)
+    async def gdprof(self, ctx, *args):
+        user = await GDLib.User.create(' '.join(args))
         emb = (discord.Embed(color=0xf7b8cf))
-        emb.set_author(name=name)
+        emb.set_author(name=user.name)
         emb.add_field(name="Rank", value=user.rank)
         emb.add_field(name="Stars", value=user.stars)
         emb.add_field(name="Diamonds", value=user.diamonds)
@@ -232,9 +251,9 @@ class Info:
 
 
     @commands.command(pass_context=True, aliases=["ytsearch", "youtubesearch", "youtube"], description="Search YouTube for a video!", brief='mb!ysearch Despacito')
-    async def ysearch(self, ctx, *, args):
+    async def ysearch(self, ctx, *args):
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as cs:
-            async with cs.get('https://www.youtube.com/results?search_query=' + args) as r:
+            async with cs.get('https://www.youtube.com/results?search_query=' + ' '.join(args)) as r:
                 f = await r.read()
             async with cs.get('https://www.youtube.com/watch?v='+ str(f).split('/watch?v=')[1].split('"')[0]) as p:
                 page = await p.read()
@@ -257,9 +276,8 @@ class Info:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["user"], description="Get the information on a discord user!", brief='mb!userinfo @Zpicy')
-    async def userinfo(self, ctx, *, args):
-        args = args.split()
-        if(args == []):
+    async def userinfo(self, ctx, *args):
+        if(args == ()):
             user = self.bot.get_user(ctx.message.author.id)
         elif (args[0][:2] == "<@" and args[0][-1] == ">"):
             if (args[0][:3] == "<@!"):

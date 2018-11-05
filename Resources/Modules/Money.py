@@ -6,9 +6,8 @@ class Money:
         self.bot = bot
 
     @commands.command(pass_context=True, description="Pay someone!", brief='mb!pay @EdgyBot 10')
-    async def pay(self, ctx, *, args):
-        args = args.split()
-        if(args != []):
+    async def pay(self, ctx, *args):
+        if(args != ()):
             s = args[0]
         else:
             s = "E"
@@ -70,10 +69,9 @@ class Money:
 
 
     @commands.command(pass_context=True, description="Get the money of someone or yourself!", brief='mb!money @Bagles')
-    async def money(self, ctx, *, args):
-        args = args.split()
+    async def money(self, ctx, *args):
         current = datetime.datetime.now()
-        if (args == []):
+        if (args == ()):
             x = ctx.message.author.id
             s = ""
         else:

@@ -9,27 +9,28 @@ class Fun:
         self.bot = bot
 
     @commands.command(pass_context=True, description="Convert to small letters!", brief="mb!smallletter Hello, world!")
-    async def smallletter(self, ctx, *, args):
-        sl = {'q': 'ᵠ', 'w': 'ʷ', 'e': 'ᵉ', 'r': 'ʳ', 't': 'ᵗ', 'y': 'ʸ', 'u': 'ᵘ', 'i': 'ᶦ', 'o': 'ᵒ', 'p': 'ᵖ', 'a': 'ᵃ', 's': 'ˢ', 'd': 'ᵈ', 'f': 'ᶠ', 'g': 'ᵍ', 'h': 'ʰ', 'j': 'ʲ', 'k': 'ᵏ', 'l': 'ˡ', 'z': 'ᶻ', 'x': 'ˣ', 'c': 'ᶜ', 'v': 'ᵛ', 'b': 'ᵇ', 'n': 'ⁿ', 'm': 'ᵐ', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '0': '⁰'}
-        args = args.split()
-        for i in range(len(args)):
-            j = args[i]
-            fin = ""
-            for l in j:
-              if(l.isalpha() or l.isdigit()):
-                fin = fin + sl[l.lower()]
-              else:
-                fin = fin + "\\" + l
-            args[i] = fin
-        emb = (discord.Embed(color=0xf7b8cf))
-        emb.add_field(name="Small Letter String", value=' '.join(args))
-        await ctx.send(embed=emb)
+    async def smallletter(self, ctx, *args):
+        if(args != ()):
+            sl = {'q': 'ᵠ', 'w': 'ʷ', 'e': 'ᵉ', 'r': 'ʳ', 't': 'ᵗ', 'y': 'ʸ', 'u': 'ᵘ', 'i': 'ᶦ', 'o': 'ᵒ', 'p': 'ᵖ', 'a': 'ᵃ', 's': 'ˢ', 'd': 'ᵈ', 'f': 'ᶠ', 'g': 'ᵍ', 'h': 'ʰ', 'j': 'ʲ', 'k': 'ᵏ', 'l': 'ˡ', 'z': 'ᶻ', 'x': 'ˣ', 'c': 'ᶜ', 'v': 'ᵛ', 'b': 'ᵇ', 'n': 'ⁿ', 'm': 'ᵐ', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '0': '⁰'}
+            for i in range(len(args)):
+                j = args[i]
+                fin = ""
+                for l in j:
+                  if(l.isalpha() or l.isdigit()):
+                    fin = fin + sl[l.lower()]
+                  else:
+                    fin = fin + "\\" + l
+                args[i] = fin
+            emb = (discord.Embed(color=0xf7b8cf))
+            emb.add_field(name="Small Letter String", value=' '.join(args))
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send("You didn't enter a valid input!")
             
 
     @commands.command(pass_context=True, description="Invert an image!", brief="mb!invert @hellosarina")
-    async def invert(self, ctx, *, args):
+    async def invert(self, ctx, *args):
         try:
-            args = args.split()
             im = await ImgLib.GetImage(self.bot, ctx, args)
             if(im):
                 im = im.convert('RGB')
@@ -44,32 +45,32 @@ class Fun:
             await ctx.send("That is not a valid image or user!")
 
     @commands.command(pass_context=True, description="Set the prefix that you'll use!", brief='mb!setprefix m!')
-    async def setprefix(self, ctx, *, args):
+    async def setprefix(self, ctx, *args):
         async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
             c = await conn.execute("SELECT * FROM Prefixes")
             user_id = ctx.message.author.id
             data = [i[0] for i in await c.fetchall()]
             if(user_id in data):
-                await c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (args, user_id))
+                await c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (' '.join(args), user_id))
                 await conn.commit()
                 await c.close()
                 await conn.close()
             else:
-                await c.execute("INSERT INTO Prefixes VALUES(?, ?)", (user_id, args))
+                await c.execute("INSERT INTO Prefixes VALUES(?, ?)", (user_id, ' '.join(args)))
                 await conn.commit()
                 await c.close()
                 await conn.close()
-        await ctx.send("Prefix set to ***__" + args + "__***!")
+        await ctx.send("Prefix set to ***__" + ' '.join(args) + "__***!")
 
     @commands.command(pass_context=True, aliases=["8ball", "8b"], description="Try your luck with the 8ball!", brief='mb!8ball Is MewBot any good?')
-    async def eightball(self, ctx, *, args):
+    async def eightball(self, ctx, *args):
         out = ""
-        out += ":8ball: " + str(ctx.message.author.mention) + ": " + args + "\nMy Response: " + random.choice(["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no", "Outlook not so good.", "Very doubtful"])
+        out += ":8ball: " + str(ctx.message.author.mention) + ": " + ' '.join(args) + "\nMy Response: " + random.choice(["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no", "Outlook not so good.", "Very doubtful"])
         await ctx.send(out)
 
     @commands.command(pass_context=True, aliases=["whosthatpokemon"], description="Play a game of Who's That Pokemon!", brief='mb!wtp')
-    async def wtp(self, ctx, *, args):
-        if(args == ""):
+    async def wtp(self, ctx, *args):
+        if(args == ()):
             await ctx.message.channel.trigger_typing()
             async with aiosqlite.connect('./Resources/Interactive/WTP.db') as conn:
                 c = await conn.execute("SELECT * FROM WTP")
@@ -92,7 +93,7 @@ class Fun:
                 await c.close()
                 await conn.close()
         else:
-            p = args.replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')
+            p = ' '.join(args).replace('-Overcast', '').replace('-Altered', '').replace('-Land', '').replace('-Spring', '').replace('-Baile', '').replace('-Solo', '')
             async with aiosqlite.connect('./Resources/Interactive/WTP.db') as conn:
                 c = await conn.execute('SELECT * FROM WTP')
                 data = await c.fetchall()
@@ -145,10 +146,10 @@ class Fun:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Translate a from one language to another!", brief='mb!translate en de Hello, world!')
-    async def translate(self, ctx, lf, lt, *, args):
+    async def translate(self, ctx, lf, lt, *args):
         try:
             x = Translator()
-            out = x.translate(args, src=lf, dest=lt)
+            out = x.translate(' '.join(args), src=lf, dest=lt)
             emb = (discord.Embed(color=0xf7b8cf))
             emb.set_author(name="Google Translate")
             emb.add_field(name=lf + " -> " + lt, value=out.text)
@@ -157,8 +158,8 @@ class Fun:
             await ctx.send("You put an invalid source or destination language!")
 
     @commands.command(pass_context=True, aliases=["levelpass"], description="Get the password of a Geometry Dash level!", brief='mb!lpass Cataclysm')
-    async def lpass(self, ctx, *, args):
-        level = await GDLib.Level.create(args)
+    async def lpass(self, ctx, *args):
+        level = await GDLib.Level.create(' '.join(args))
         if(level.password != 0):
             emb = (discord.Embed(color=0xf7b8cf))
             emb.set_author(name=level.title)
@@ -168,8 +169,7 @@ class Fun:
             await ctx.send("There is no pass for the level __**" + level.title + "**__.")
 
     @commands.command(pass_context=True, aliases=["blurplefy"], description="Blurplefy an image!", brief='mb!blurple https://bit.ly/2RuKIDr')
-    async def blurple(self, ctx, *, args):
-        args = args.split()
+    async def blurple(self, ctx, *args):
         im = await ImgLib.GetImage(self.bot, ctx, args)
         im = await ImgLib.Blurplefy(im)
         output_buffer = io.BytesIO()
@@ -225,7 +225,7 @@ class Fun:
     @commands.command(pass_context=True, aliases=["saydelete"], description="Have MewBot say something, then delete your message!", brief='mb!sayd Hello, world!')
     async def sayd(self, ctx, *, args):
         try:
-            if(args == ()):
+            if(args == ""):
                 await ctx.send('You need to enter a message for me to say!')
             else:
                 await ctx.message.delete()
@@ -239,8 +239,7 @@ class Fun:
         await ctx.message.channel.send(str(ctx.message.author.mention) + ", Here is your otter\n" + random.choice(o))
 
     @commands.command(pass_context=True, aliases=["deepfry"], description="Deepfry an image!", brief='mb!df https://bit.ly/2RuKIDr')
-    async def df(self, ctx, *, args):
-        args = args.split()
+    async def df(self, ctx, *args):
         im = await ImgLib.GetImage(self.bot, ctx, args)
         if(im):
             factor = (259 * (255 + 255)) / (255 * (259 - 255))
@@ -255,7 +254,7 @@ class Fun:
             await ctx.send("Image Not Found!")
 
     @commands.command(pass_context=True, aliases=["emoji"], description="Turn a message into big letters!", brief='mb!bigletter Hello, world!')
-    async def bigletter(self, ctx, *, args):
+    async def bigletter(self, ctx, *args):
         f = list(args)
         fin = ""
         for i in f:
@@ -272,7 +271,7 @@ class Fun:
 
     @commands.command(pass_context=True, description="Have MewBot say something!", brief='mb!say Hello, world!')
     async def say(self, ctx, *, args):
-        if(args == ()):
+        if(args == ""):
             await ctx.send("You need to enter a message for me to say!")
         else:
             await ctx.send(args)
@@ -299,9 +298,9 @@ class Fun:
             await ctx.send("You can't duel no one! Tag someone!")
 
     @commands.command(pass_context=True, description="Jeff someone!", brief='mb!jeff @File_34')
-    async def jeff(self, ctx, *, args):
+    async def jeff(self, ctx, *args):
         if(args):
-            u = args.split()[0]
+            u = args[0]
             user = None
             if((u.startswith('<@') or u.isdigit()) and u.split('<@')[-1].split('>')[0].isdigit()):
                 try:
@@ -330,10 +329,10 @@ class Fun:
         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["suggest", "sg"], description="Suggest something for me to add to MewBot!", brief='mb!sugg There should be ____')
-    async def sugg(self, ctx, *, args):
+    async def sugg(self, ctx, *args):
         if(args != "SUGGESTION"):
             swears = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard', 'bitch', 'biatch', 'bloody', 'blowjob', 'blow', 'bollock', 'bollok', 'boner', 'boob', 'bugger', 'bum', 'butt', 'buttplug', 'clitoris', 'cock', 'coon', 'crap', 'cunt', 'damn', 'dick', 'dildo', 'dyke', 'fag', 'feck', 'fellate', 'fellatio', 'felching', 'fuck', 'fudgepacker', 'packer', 'flange', 'goddamn', 'damn', 'hell', 'homo', 'jerk', 'jizz', 'knobend', 'knob', 'end', 'labia', 'lmao', 'lmfao', 'muff', 'nigger', 'nigga', 'omg', 'penis', 'piss', 'poop', 'porn', 'prick', 'pube', 'pussy', 'queer', 'scrotum', 'sex', 'shit', 'sh1t', 'slut', 'smegma', 'spunk', 'tit', 'tosser', 'turd', 'twat', 'vagina', 'wank', 'whore', 'wtf', 'negro', 'succ', 'retard', 'shiet', 'gay', 'dong', 'killyourself']
-            x = args
+            x = ' '.join(args)
             count = 0
             for i in range(len(swears)):
                 if(swears[i] in ''.join(args)):
