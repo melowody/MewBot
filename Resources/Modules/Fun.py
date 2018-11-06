@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, os, aiosqlite, PIL.ImageOps
+import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, Resources.Lib.GoogleLib as GoogleLib, Resources.Interactive.Paginator as Paginator, os, aiosqlite, PIL.ImageOps
 from googletrans import Translator
 from PIL import Image
 from difflib import SequenceMatcher
@@ -7,6 +7,11 @@ from discord.ext import commands
 class Fun:
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(pass_context=True, description="Google search for an image!", brief="mb!imagesearch Mew", aliases=["image", "gimage", "googleimage", "gimagesearch", "googleimagesearch"])
+    async def imagesearch(self, ctx, *args):
+        imgs = await GoogleLib.get_google_images(' '.join(args))
+        await Paginator.PaginatorNoSkip(self.bot, ctx.message, imgs)
 
     @commands.command(pass_context=True, description="Convert to small letters!", brief="mb!smallletter Hello, world!")
     async def smallletter(self, ctx, *args):
