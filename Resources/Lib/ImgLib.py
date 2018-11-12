@@ -1,5 +1,25 @@
-import discord, asyncio, io, aiohttp, numpy as np
+import discord, asyncio, io, aiohttp, numpy as np, math
 from PIL import Image
+
+async def Pixelate(im):
+    
+    # All credit for this code goes to https://gist.github.com/danyshaanan/6754465
+    
+    im = im.convert("RGBA")
+    a, b = im.size
+    pixelSize = 10**(len(str(min([a, b])))-2)
+    im = im.resize((math.floor(a/pixelSize)*pixelSize,math.floor(b/pixelSize)*pixelSize))
+    backgroundColor = (0,)*3
+    im = im.resize((int(im.size[0]/pixelSize), int(im.size[1]/pixelSize)), Image.NEAREST)
+    im = im.resize((int(im.size[0]*pixelSize), int(im.size[1]*pixelSize)), Image.NEAREST)
+    pixel = im.load()
+    for i in range(0,im.size[0],pixelSize):
+      for j in range(0,im.size[1],pixelSize):
+        for r in range(pixelSize):
+          pixel[i+r,j] = backgroundColor
+          pixel[i,j+r] = backgroundColor
+    
+    return im
 
 async def Blurplefy(im):
     im = im.convert("LA")

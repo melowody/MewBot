@@ -1,15 +1,8 @@
-import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.MKWLib as MKWLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry
+import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.MKWLib as MKWLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry, io
+from PIL import Image
 from discord.ext import commands
 from mcstatus import MinecraftServer
 from twitch import TwitchClient
-
-'''x = await CSGOLib.get_weapon_skins(weapon)
-    fin = []
-    for i in x:
-        emb = (discord.Embed(color=0xf7b8cf))
-        emb.add_field(name=weapon, value=y)
-        fin.append(emb)
-'''
 
 dupt = datetime.datetime.now()
 
@@ -17,9 +10,26 @@ class Info:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(pass_context=True, description="Graph an equation!", brief="mb!graph EQUATION", aliases=["eq", "equation", "eqgraph", "equationgraph"])
+    async def graph(self, ctx, equation):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get("http://api.wolframalpha.com/v2/query?input=" + equation + "&appid=" + open("C:/TOKENS/WOLFRAM.txt").read()) as f:
+                x = str(await f.read()).split("<pod title='Plot")[1].split('alt')[0].split("src='")[1].split("'")[0] if "<pod title='Plot" in str(await f.read()) else "None"
+                r = html.unescape(x)
+                if(r == "None"):
+                    await ctx.send("That's not a vaild input!")
+                    return
+            async with cs.get(r) as f:
+                x = await f.read()
+        plot = Image.open(io.BytesIO(x)).convert("RGB")
+        output_buffer = io.BytesIO()
+        plot.save(output_buffer, "png")
+        output_buffer.seek(0)
+        await ctx.send(file=discord.File(output_buffer, filename="plot.png"))
+        await ctx.send("Graph by *WolframAlpha*")
+
     @commands.command(pass_context=True, description="Get the top time for an MKW course!", brief="mb!mkwtop COURSE", aliases=["mkw", "ctgp", "top", "ctgptop", "mariokartwii", "mariokartwiitop", "customtrackgrandprix", "customtrackgrandprixtop"])
     async def mkwtop(self, ctx, *args):
-        await ctx.message.channel.trigger_typing()
         x = await MKWLib.get_top(self.bot, ctx.message, ' '.join(args))
         if(x != 0):
             emb = (discord.Embed(color=0xf7b8cf))
@@ -86,7 +96,6 @@ class Info:
             if(wi['domain_name'] == None):
                 await ctx.send('Domain not found!')
             else:
-                await ctx.message.channel.trigger_typing()
                 emb = (discord.Embed(color=0xf7b8cf))
                 ud = wi['updated_date']
                 emb.set_author(name=website, url=('http://' + website if not website.startswith('http') else website))

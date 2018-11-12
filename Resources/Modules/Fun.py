@@ -8,6 +8,15 @@ class Fun:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(pass_context=True, description="Pixelate an image!", brief="mb!pixelate @darthcolton", aliases=["pixel"])
+    async def pixelate(self, ctx, *args):
+        x = await ImgLib.GetImage(self.bot, ctx, args)
+        im = await ImgLib.Pixelate(x)
+        output_buffer = io.BytesIO()
+        im.save(output_buffer, "png")
+        output_buffer.seek(0)
+        await ctx.send(file=discord.File(output_buffer, filename="pixelate.png"))
+
     @commands.command(pass_context=True, description="Google search for an image!", brief="mb!imagesearch Mew", aliases=["image", "gimage", "googleimage", "gimagesearch", "googleimagesearch"])
     async def imagesearch(self, ctx, *args):
         imgs = await GoogleLib.get_google_images(' '.join(args))
@@ -76,7 +85,6 @@ class Fun:
     @commands.command(pass_context=True, aliases=["whosthatpokemon"], description="Play a game of Who's That Pokemon!", brief='mb!wtp')
     async def wtp(self, ctx, *args):
         if(args == ()):
-            await ctx.message.channel.trigger_typing()
             async with aiosqlite.connect('./Resources/Interactive/WTP.db') as conn:
                 c = await conn.execute("SELECT * FROM WTP")
                 data = await c.fetchall()

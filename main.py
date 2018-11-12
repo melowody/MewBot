@@ -37,9 +37,11 @@ async def on_message(message):
                     if(not user.bot):
                         x += 1
             async with aiohttp.ClientSession() as aioclient:
-                await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
+                #await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
                 await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("C:/TOKENS/DBL.txt").read()})
                 await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data={"guilds": len(client.guilds), "users": x}, headers={"Authorization": open("C:/TOKENS/DBL2.txt").read()})
+            if(message.content.split()[0] != "mb!ping"):
+                await message.channel.trigger_typing()
             await client.process_commands(message)
     else:
         if(message.content.startswith("mb!") and not message.author.bot):
@@ -52,9 +54,11 @@ async def on_message(message):
                     if(not user.bot):
                         x += 1
             async with aiohttp.ClientSession() as aioclient:
-                await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
+                #await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
                 await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("C:/TOKENS/DBL.txt").read()})
                 await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data={"guilds": len(client.guilds), "users": x}, headers={"Authorization": open("C:/TOKENS/DBL2.txt").read()})
+            if(message.content.split()[0] != "mb!ping"):
+                await message.channel.trigger_typing()
             await client.process_commands(message)
 
 @client.event
