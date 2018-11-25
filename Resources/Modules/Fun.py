@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.MusicLib as MusicLib, Resources.Lib.PokeAPI as PokeAPI, Resources.Lib.GoogleLib as GoogleLib, Resources.Interactive.Paginator as Paginator, os, aiosqlite, PIL.ImageOps
+import discord, aiohttp, asyncio, codecs, datetime, pytz, random, time, sys, io, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.NewgroundsLib as NewgroundsLib, Resources.Lib.PokeAPI as PokeAPI, Resources.Lib.GoogleLib as GoogleLib, Resources.Interactive.Paginator as Paginator, os, aiosqlite, PIL.ImageOps
 from googletrans import Translator
 from PIL import Image
 from difflib import SequenceMatcher
@@ -7,6 +7,17 @@ from discord.ext import commands
 class Fun:
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(pass_context=True, description="Get an image of a cat!", brief="mb!cat", aliases=["catimage"])
+    async def cat(self, ctx):
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get('https://api.thecatapi.com/v1/images/search?size=full&mime_types=jpg,png') as f:
+                r = await f.json()
+                url = r[0]['url']
+        emb = (discord.Embed(color=0xf7b8cf))
+        emb.set_image(url=url)
+        emb.set_footer(text="Cat API: https://www.thecatapi.com/")
+        await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, description="Pixelate an image!", brief="mb!pixelate @darthcolton", aliases=["pixel"])
     async def pixelate(self, ctx, *args):
@@ -40,7 +51,7 @@ class Fun:
             await ctx.send(embed=emb)
         else:
             await ctx.send("You didn't enter a valid input!")
-            
+
 
     @commands.command(pass_context=True, description="Invert an image!", brief="mb!invert @hellosarina")
     async def invert(self, ctx, *args):
@@ -60,15 +71,22 @@ class Fun:
 
     @commands.command(pass_context=True, description="Set the prefix that you'll use!", brief='mb!setprefix m!')
     async def setprefix(self, ctx, *args):
+        prefix = ' '.join(args)
         async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
             c = await conn.execute("SELECT * FROM Prefixes")
             user_id = ctx.message.author.id
             data = [i[0] for i in await c.fetchall()]
             if(user_id in data):
-                await c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (' '.join(args), user_id))
-                await conn.commit()
-                await c.close()
-                await conn.close()
+                if(prefix != "mb!"):
+                    await c.execute("UPDATE Prefixes SET Prefix = ? WHERE ClientID = ?", (prefix, user_id))
+                    await conn.commit()
+                    await c.close()
+                    await conn.close()
+                else:
+                    await c.execute("DELETE FROM Prefixes WHERE ClientID = ?", (user_id,))
+                    await conn.commit()
+                    await c.close()
+                    await conn.close()
             else:
                 await c.execute("INSERT INTO Prefixes VALUES(?, ?)", (user_id, ' '.join(args)))
                 await conn.commit()
@@ -343,7 +361,8 @@ class Fun:
 
     @commands.command(pass_context=True, aliases=["suggest", "sg"], description="Suggest something for me to add to MewBot!", brief='mb!sugg There should be ____')
     async def sugg(self, ctx, *args):
-        if(args != "SUGGESTION"):
+        if(args != ('SUGGESTION',)):
+            print(args)
             swears = ['anal', 'anus', 'arse', 'ass', 'ballsack', 'balls', 'bastard', 'bitch', 'biatch', 'bloody', 'blowjob', 'blow', 'bollock', 'bollok', 'boner', 'boob', 'bugger', 'bum', 'butt', 'buttplug', 'clitoris', 'cock', 'coon', 'crap', 'cunt', 'damn', 'dick', 'dildo', 'dyke', 'fag', 'feck', 'fellate', 'fellatio', 'felching', 'fuck', 'fudgepacker', 'packer', 'flange', 'goddamn', 'damn', 'hell', 'homo', 'jerk', 'jizz', 'knobend', 'knob', 'end', 'labia', 'lmao', 'lmfao', 'muff', 'nigger', 'nigga', 'omg', 'penis', 'piss', 'poop', 'porn', 'prick', 'pube', 'pussy', 'queer', 'scrotum', 'sex', 'shit', 'sh1t', 'slut', 'smegma', 'spunk', 'tit', 'tosser', 'turd', 'twat', 'vagina', 'wank', 'whore', 'wtf', 'negro', 'succ', 'retard', 'shiet', 'gay', 'dong', 'killyourself']
             x = ' '.join(args)
             count = 0

@@ -10,11 +10,28 @@ class Info:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(pass_context=True, description="Check someone's Minecraft name!", brief="mb!check GDNewbie", aliases=["check", "cname", "checkn", "cn"])
+    async def checkname(self, ctx, *args):
+        if(args == ()):
+            await ctx.send("You need to write a name to check!")
+            return
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get('https://api.mojang.com/users/profiles/minecraft/' + args[0]) as r:
+                a = r.status
+            if(a == 200):
+                await ctx.send("The name *" + args[0] + "* is taken!")
+            elif(a == 204):
+                await ctx.send("The name *" + args[0] + "* is free!")
+            else:
+                await ctx.send("What even happened...I'm sending an error.")
+                raise IndexError("Invalid thing..." + str(a))
+
     @commands.command(pass_context=True, description="Graph an equation!", brief="mb!graph EQUATION", aliases=["eq", "equation", "eqgraph", "equationgraph"])
-    async def graph(self, ctx, equation):
+    async def graph(self, ctx, *args):
+        equation = ''.join(args).lower().replace('+',' plus ')
         async with aiohttp.ClientSession() as cs:
             async with cs.get("http://api.wolframalpha.com/v2/query?input=" + equation + "&appid=" + open("C:/TOKENS/WOLFRAM.txt").read()) as f:
-                x = str(await f.read()).split("<pod title='Plot")[1].split('alt')[0].split("src='")[1].split("'")[0] if "<pod title='Plot" in str(await f.read()) else "None"
+                x = str(await f.read()).split("<pod title='Polar")[1].split('alt')[0].split("src='")[1].split("'")[0] if "<pod title='Polar" in str(await f.read()) else (str(await f.read()).split("<pod title='Implicit")[1].split('alt')[0].split("src='")[1].split("'")[0] if "<pod title='Implicit" in str(await f.read()) else (str(await f.read()).split("<pod title='Plot")[1].split('alt')[0].split("src='")[1].split("'")[0] if "<pod title='Plot" in str(await f.read()) else "None"))
                 r = html.unescape(x)
                 if(r == "None"):
                     await ctx.send("That's not a vaild input!")
@@ -25,7 +42,7 @@ class Info:
         output_buffer = io.BytesIO()
         plot.save(output_buffer, "png")
         output_buffer.seek(0)
-        await ctx.send(file=discord.File(output_buffer, filename="plot.png"))
+        await ctx.send("Query by " + ctx.message.author.mention, file=discord.File(output_buffer, filename="plot.png"))
         await ctx.send("Graph by *WolframAlpha*")
 
     @commands.command(pass_context=True, description="Get the top time for an MKW course!", brief="mb!mkwtop COURSE", aliases=["mkw", "ctgp", "top", "ctgptop", "mariokartwii", "mariokartwiitop", "customtrackgrandprix", "customtrackgrandprixtop"])

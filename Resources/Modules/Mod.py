@@ -1,10 +1,32 @@
-import asyncio, aiohttp, discord, codecs, subprocess
+import asyncio, aiohttp, discord, codecs, subprocess, aiosqlite
 from discord.ext import commands
 
 class Mod:
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(pass_context=True, description="Set the prefix that your server will use!", brief='mb!gprefix m!', aliases=['gprefix'])
+    async def guildprefix(self, ctx, *args):
+        if(ctx.message.author.guild_permissions.manage_guild):
+            prefix = ' '.join(args)
+            async with aiosqlite.connect("./Resources/Interactive/ServerPrefixes.db") as conn:
+                c = await conn.execute("SELECT * FROM Prefixes")
+                server_id = ctx.message.guild.id
+                data = [i[0] for i in await c.fetchall()]
+                if(server_id in data):
+                    await conn.execute("UPDATE Prefixes SET Prefix = ? WHERE ServerID = ?", (prefix, server_id))
+                    await conn.commit()
+                    await c.close()
+                    await conn.close()
+                else:
+                    await conn.execute("INSERT INTO Prefixes VALUES(?, ?)", (server_id, prefix))
+                    await conn.commit()
+                    await c.close()
+                    await conn.close()
+                await ctx.send("Server Prefix set to ***__" + prefix + "__***!")
+        else:
+            await ctx.send("You do not have the `Manage Guild` permission!")
 
     @commands.command(pass_context=True, aliases=["exec"], description="BOT OWNER ONLY: Execute some python code!", brief='mb!execute "print(\'Hello, world!\')"')
     async def execute(self, ctx, c):
