@@ -1,10 +1,10 @@
-import discord, asyncio, io, aiohttp, numpy as np, math
+import discord, asyncio, io, aiohttp, numpy as np, math, socket
 from PIL import Image
 
 async def Pixelate(im):
-    
+
     # All credit for this code goes to https://gist.github.com/danyshaanan/6754465
-    
+
     im = im.convert("RGBA")
     a, b = im.size
     pixelSize = 10**(len(str(min([a, b])))-2)
@@ -18,7 +18,7 @@ async def Pixelate(im):
         for r in range(pixelSize):
           pixel[i+r,j] = backgroundColor
           pixel[i,j+r] = backgroundColor
-    
+
     return im
 
 async def Blurplefy(im):
@@ -73,9 +73,12 @@ async def GetImage(client, ctx, args):
         x = args[0]
     else:
         return None
-    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as aioclient:
-        async with aioclient.get(x) as r:
-            f = await r.read()
+    try:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False)) as aioclient:
+            async with aioclient.get(x) as r:
+                f = await r.read()
+    except:
+        return None
     if (x.split(".")[-1].split("?")[0].lower() == "webp"):
         return Image.open(io.BytesIO(f)).convert("RGB")
     else:

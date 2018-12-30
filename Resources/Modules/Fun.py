@@ -3,10 +3,33 @@ from googletrans import Translator
 from PIL import Image
 from difflib import SequenceMatcher
 from discord.ext import commands
+from arsenic import get_session
+from arsenic.browsers import Firefox
+from arsenic.services import Geckodriver
 
 class Fun:
     def __init__(self, bot):
         self.bot = bot
+
+    '''@commands.command(pass_context=True, description="Screenshot a website!", brief="mb!screenshot https://newgrounds.com", aliases=["ss"])
+    async def screenshot(self, ctx, website):
+        print(1)
+        async with get_session(Geckodriver(binary="./Resources/Interactive/geckodriver.exe"), Firefox(**{'moz:firefoxOptions': { 'args': ['-headless'] }})) as session:
+            print(2)
+            await session.get(('http://' if not website.startswith('http://') else "") + website)
+            print(3)
+            ss = await session.get_screenshot()
+            print(4)
+        im = Image.open(ss)
+        print(5)
+        output_buffer = io.BytesIO()
+        print(6)
+        im.save(output_buffer, "png")
+        print(7)
+        output_buffer.seek(0)
+        print(8)
+        await ctx.send(file=discord.File(output_buffer, filename="ss.png"))
+        print(9)'''
 
     @commands.command(pass_context=True, description="Get an image of a cat!", brief="mb!cat", aliases=["catimage"])
     async def cat(self, ctx):
@@ -22,6 +45,9 @@ class Fun:
     @commands.command(pass_context=True, description="Pixelate an image!", brief="mb!pixelate @darthcolton", aliases=["pixel"])
     async def pixelate(self, ctx, *args):
         x = await ImgLib.GetImage(self.bot, ctx, args)
+        if(x == None):
+            await ctx.send("That is not a valid image!")
+            return
         im = await ImgLib.Pixelate(x)
         output_buffer = io.BytesIO()
         im.save(output_buffer, "png")
@@ -30,6 +56,9 @@ class Fun:
 
     @commands.command(pass_context=True, description="Google search for an image!", brief="mb!imagesearch Mew", aliases=["image", "gimage", "googleimage", "gimagesearch", "googleimagesearch"])
     async def imagesearch(self, ctx, *args):
+        if(args == ()):
+            await ctx.send("You need to enter something to search!")
+            return
         imgs = await GoogleLib.get_google_images(' '.join(args))
         await Paginator.PaginatorNoSkip(self.bot, ctx.message, imgs)
 

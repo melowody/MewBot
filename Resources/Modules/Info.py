@@ -1,4 +1,4 @@
-import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.MKWLib as MKWLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry, io
+import discord, aiohttp, asyncio, Resources.Lib.HypixelLib as HypixelLib, Resources.Interactive.Paginator as Paginator, Resources.Lib.CSGOLib as CSGOLib, Resources.Lib.ImgLib as ImgLib, Resources.Lib.GDLib as GDLib, Resources.Lib.MKWLib as MKWLib, datetime, time, re, html, codecs, whois as wis, aiosqlite, pycountry, io, socket
 from PIL import Image
 from discord.ext import commands
 from mcstatus import MinecraftServer
@@ -366,7 +366,7 @@ class Info:
     async def csp(self, ctx):
         finname = ""
         q1 = await ctx.send("Which Weapon will you choose?")
-        low = ["Glock-18", "USP-S", "P2000", "P250", "Desert Eagle", "Dual Berettas", "Tec-9", "Five-SeveN", "CZ75-Auto", "R8 Revolver", "Nova", "XM1014", "Sawed-Off", "MAG-7", "MAC-10", "MP9", "MP7", "MP5-SD", "UMP-45", "PP-Bizon", "P90", "Galil-AR", "FAMAS", "AK-47", "M4A4", "M4A1-S", "SSG 08", "AUG", "SG 553", "AWP", "G3SG1", "SCAR-20"]
+        low = ["Glock-18", "USP-S", "P2000", "P250", "Desert Eagle", "Dual Berettas", "Tec-9", "Five-SeveN", "CZ75-Auto", "R8 Revolver", "Nova", "XM1014", "Sawed-Off", "MAG-7", "MAC-10", "MP9", "MP7", "MP5-SD", "UMP-45", "PP-Bizon", "P90", "Galil-AR", "FAMAS", "AK-47", "M4A4", "M4A1-S", "SSG 08", "AUG", "SG 553", "AWP", "G3SG1", "SCAR-20", "Talon Knife", "Stiletto Knife", "Ursus Knife", "Navaja Knife", "Bowie Knife", "Shadow Daggers", "Falchion Knife", "Butterfly Knife", "Huntsman Knife", "Karambit", "M9 Bayonet", "Bayonet", "Flip Knife", "Gut Knife"]
         lowe = []
         for i in low:
             emb = (discord.Embed(color=0xf7b8cf))
@@ -378,7 +378,7 @@ class Info:
         lose = []
         for i in skins:
             emb = (discord.Embed(color=0xf7b8cf))
-            emb.set_author(name=i.replace("\\'", "'").replace("\\xe5\\xbc\\x90", "弐").replace("\\xe5\\xa3\\xb1", "壱").replace('\\xe9\\xbe\\x8d\\xe7\\x8e\\x8b', "龍王"))
+            emb.set_author(name=i.replace("\\'", "'").replace("\\xe5\\xbc\\x90", "弐").replace("\\xe5\\xa3\\xb1", "壱").replace('\\xe9\\xbe\\x8d\\xe7\\x8e\\x8b', "龍王").replace("\\xe2\\x98\\x85", "★"))
             lose.append(emb)
         if(x):
             q2 = await ctx.send('Which Skin will you choose?')
@@ -407,10 +407,10 @@ class Info:
                     if(a):
                         stattrak = a.author.name == "StatTrak"
                         souvenir = a.author.name == "Souvenir"
-                        skin = await CSGOLib.WeaponSkin.create(x.author.name, y.author.name, z.author.name, stattrak=stattrak, souvenir=souvenir)
+                        skin = await CSGOLib.WeaponSkin.create(("★ " + x.author.name if "Knife" in x.author.name or "Bayonet" in x.author.name else x.author.name), y.author.name, z.author.name, stattrak=stattrak, souvenir=souvenir)
                         emb = (discord.Embed(color=0xf7b8cf))
-                        emb.set_author(name=("StatTrak™ " if stattrak else "") + ("Souvenir " if souvenir else "") + x.author.name + " | " + y.author.name + " (" + z.author.name + ")")
-                        emb.add_field(name="Price", value=(("$" + str(skin.price)) if skin.price != 0 else "This skin doesn't exist"))
+                        emb.set_author(name=("StatTrak™ " if stattrak else "") + ("Souvenir " if souvenir else "") + ("★ " + x.author.name if "Knife" in x.author.name or "Bayonet" in x.author.name else x.author.name) + " | " + y.author.name + " (" + z.author.name + ")")
+                        emb.add_field(name="Price", value=(("$" + str(skin.price)) if skin.price != 0 else "This skin doesn't have a price or it doesn't exist!"))
                         await ctx.send(embed=emb)
 
     @commands.command(pass_context=True, aliases=["hypixel", "hypixels", "hstats", "hypixelstats"], description="Get the stats of a player on Hypixel!", brief='mb!hs pigpatty')

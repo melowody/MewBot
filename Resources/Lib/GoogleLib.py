@@ -12,6 +12,7 @@ async def get_google_images(search_query):
         async with aiohttp.ClientSession() as cs:
             async with cs.get(url, headers=headers) as f:
                 soup = bs4.BeautifulSoup(await f.text(), "lxml")
+        print(soup)
         for j in soup.find("div", {"id": "ires"}).find_all("a"):
             emb = (discord.Embed(color=0xf7b8cf))
             emb.set_author(name="Google Image Search - " + search_query)

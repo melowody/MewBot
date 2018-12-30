@@ -14,9 +14,10 @@ async def on_ready():
     print("Name: {}".format(client.user.name))
     print("ID: {}".format(client.user.id))
 
-
 @client.event
 async def on_message(message):
+    if(message.author.bot):
+        return
     async with aiosqlite.connect('./Resources/Interactive/Prefixes.db') as conn:
         c = await conn.execute("SELECT * FROM Prefixes")
         buffer = await c.fetchall()
@@ -33,7 +34,7 @@ async def on_message(message):
     data2 = [i[0] for i in buffer2]
     if(user_id in data):
         cprefix = buffer[data.index(user_id)][-1]
-        if(message.content.startswith(cprefix) and not message.author.bot):
+        if(message.content.startswith(cprefix)):
             message.content = "mb!" + message.content[len(cprefix):].split()[0].lower() + ' ' + ' '.join(message.content[len(cprefix):].split()[1:]) if len(message.content[len(cprefix):].split()) != 1 else "mb!" + message.content[len(cprefix):].split()[0].lower()
             game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
             await client.change_presence(activity=game)
@@ -47,22 +48,12 @@ async def on_message(message):
                 await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
                 await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("C:/TOKENS/DBL.txt").read()})
                 await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data={"guilds": len(client.guilds), "users": x}, headers={"Authorization": open("C:/TOKENS/DBL2.txt").read()})
+                await aioclient.post("https://discord.bots.gg/api/v1/bots/" + str(client.user.id) + "/stats", data={"guildCount": len(client.guilds)}, headers={"Authorization": open("C:/TOKENS/DBGG.txt").read()})
             await client.process_commands(message)
     elif(server_id in data2):
         cprefix = buffer2[data2.index(server_id)][-1]
-        if(message.content.startswith(cprefix) and not message.author.bot):
+        if(message.content.startswith(cprefix)):
             message.content = "mb!" + message.content[len(cprefix):].split()[0].lower() + ' ' + ' '.join(message.content[len(cprefix):].split()[1:]) if len(message.content[len(cprefix):].split()) != 1 else "mb!" + message.content[len(cprefix):].split()[0].lower()
-            game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
-            await client.change_presence(activity=game)
-            payload = {"server_count": str(len(client.guilds))}
-            x = 0
-            for server in client.guilds:
-                for user in server.members:
-                    if(not user.bot):
-                        x += 1
-            await client.process_commands(message)
-    else:
-        if(message.content.startswith("mb!") and not message.author.bot):
             game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
             await client.change_presence(activity=game)
             payload = {"server_count": str(len(client.guilds))}
@@ -75,6 +66,23 @@ async def on_message(message):
                 await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
                 await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("C:/TOKENS/DBL.txt").read()})
                 await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data={"guilds": len(client.guilds), "users": x}, headers={"Authorization": open("C:/TOKENS/DBL2.txt").read()})
+                await aioclient.post("https://discord.bots.gg/api/v1/bots/" + str(client.user.id) + "/stats", data={"guildCount": len(client.guilds)}, headers={"Authorization": open("C:/TOKENS/DBGG.txt").read()})
+            await client.process_commands(message)
+    else:
+        if(message.content.startswith("mb!")):
+            game = discord.Game('for mb!help | Currently in ' + str(len(client.guilds)) + ' servers!', type=discord.ActivityType.watching)
+            await client.change_presence(activity=game)
+            payload = {"server_count": str(len(client.guilds))}
+            x = 0
+            for server in client.guilds:
+                for user in server.members:
+                    if(not user.bot):
+                        x += 1
+            async with aiohttp.ClientSession() as aioclient:
+                await aioclient.post('https://botsfordiscord.com/api/bot/' + str(client.user.id), data=payload, headers={"Authorization": open('C:/TOKENS/BFD.txt').read()})
+                await aioclient.post("https://discordbots.org/api/bots/" + str(client.user.id) + "/stats", data=payload, headers={"Authorization": open("C:/TOKENS/DBL.txt").read()})
+                await aioclient.post("https://discordbotlist.com/api/bots/" + str(client.user.id) + "/stats", data={"guilds": len(client.guilds), "users": x}, headers={"Authorization": open("C:/TOKENS/DBL2.txt").read()})
+                await aioclient.post("https://discord.bots.gg/api/v1/bots/" + str(client.user.id) + "/stats", data={"guildCount": len(client.guilds)}, headers={"Authorization": open("C:/TOKENS/DBGG.txt").read()})
             await client.process_commands(message)
 
 @client.event
@@ -86,9 +94,10 @@ async def on_command_error(ctx, error):
     elif(isinstance(error, discord.ext.commands.errors.MissingRequiredArgument)):
         await ctx.send("It seems that you have not put in all the required arguments!")
     else:
-        await ctx.send("It seems an error has occured. Use mb!sugg to tell me about it!")
+        await ctx.send("It seems an error has occured. I'll be sure to fix it as soon as I can!")
         venom = client.get_user(190804082032640000)
         emb = (discord.Embed(color=0xff0000))
+        print(''.join(y))
         emb.set_author(name="ERROR")
         emb.add_field(name="Command", value=ctx.message.content)
         emb.add_field(name="Traceback", value='```' + ''.join(y).split('The above exception was the direct cause')[0][-1000:] + '```')

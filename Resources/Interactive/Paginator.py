@@ -29,7 +29,7 @@ async def DemonlistPaginator(client, message):
             try:
                 await botmsg.delete()
                 break
-            except discord.errors.Forbidden:
+            except (discord.errors.Forbidden, discord.errors.NotFound) as e:
                 break
         else:
             if(str(reaction.emoji) == "▶"):
@@ -63,6 +63,8 @@ async def DemonlistPaginator(client, message):
                 except discord.errors.Forbidden:
                     await ctx.send("MewBot does not have the `Delete Message` permission.")
                     break
+                except discord.errors.NotFound:
+                    break
             elif(str(reaction.emoji) == "\U0001F522"):
                 msg = await client.wait_for('message', check=check)
                 current = int(msg.content)
@@ -91,7 +93,7 @@ async def ReactionPaginator(client, message, x):
             try:
                 await botmsg.delete()
                 break
-            except discord.errors.Forbidden:
+            except (discord.errors.Forbidden, discord.errors.NotFound) as e:
                 break
         else:
             if(str(reaction.emoji) == "▶"):
@@ -125,6 +127,8 @@ async def ReactionPaginator(client, message, x):
                 except discord.errors.Forbidden:
                     await ctx.send("MewBot does not have the `Delete Message` permission.")
                     break
+                except discord.errors.NotFound:
+                    break
 
 async def PaginatorNoSkip(client, message, x):
     current = 0
@@ -143,41 +147,46 @@ async def PaginatorNoSkip(client, message, x):
             try:
                 await botmsg.delete()
                 break
-            except discord.errors.Forbidden:
+            except (discord.errors.Forbidden, discord.errors.NotFound) as e:
                 break
             break
         else:
-            if(str(reaction.emoji) == "▶"):
-                try:
-                    current += 1
+            try:
+                if(str(reaction.emoji) == "▶"):
+                    try:
+                        current += 1
+                        await botmsg.edit(embed=x[current])
+                        await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                    except IndexError:
+                        current -= 1
+                        await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                elif(str(reaction.emoji) == "◀"):
+                    if(current > 0):
+                        current -= 1
+                        await botmsg.edit(embed=x[current])
+                        await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                    else:
+                        current += 1
+                        await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
+                elif(str(reaction.emoji) == "⏪"):
+                    current = 0
                     await botmsg.edit(embed=x[current])
                     await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
-                except IndexError:
-                    current -= 1
-                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
-            elif(str(reaction.emoji) == "◀"):
-                if(current > 0):
-                    current -= 1
+                elif(str(reaction.emoji) == "⏩"):
+                    current = len(x) - 1
                     await botmsg.edit(embed=x[current])
                     await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
-                else:
-                    current += 1
-                    await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
-            elif(str(reaction.emoji) == "⏪"):
-                current = 0
-                await botmsg.edit(embed=x[current])
-                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
-            elif(str(reaction.emoji) == "⏩"):
-                current = len(x) - 1
-                await botmsg.edit(embed=x[current])
-                await botmsg.remove_reaction(reaction, message.guild.get_member(user.id))
-            elif(str(reaction.emoji) == "⏹"):
-                try:
-                    await botmsg.delete()
-                    break
-                except discord.errors.Forbidden:
-                    await ctx.send("MewBot does not have the `Delete Message` permission.")
-                    break
+                elif(str(reaction.emoji) == "⏹"):
+                    try:
+                        await botmsg.delete()
+                        break
+                    except discord.errors.Forbidden:
+                        await ctx.send("MewBot does not have the `Delete Message` permission.")
+                        break
+                    except discord.errors.Notfound:
+                        break
+            except discord.errors.Forbidden:
+                await ctx.send("MewBot does not have the `Remove Reactions` permission.")
 
 async def Paginator(client, message, x):
     current = 0
@@ -197,7 +206,7 @@ async def Paginator(client, message, x):
             try:
                 await botmsg.delete()
                 break
-            except discord.errors.Forbidden:
+            except (discord.errors.Forbidden, discord.errors.NotFound) as e:
                 break
             break
         else:
@@ -231,6 +240,8 @@ async def Paginator(client, message, x):
                     break
                 except discord.errors.Forbidden:
                     await ctx.send("MewBot does not have the `Delete Message` permission.")
+                    break
+                except discord.errors.NotFound:
                     break
             elif(str(reaction.emoji) == "\U0001F522"):
                 msg = await client.wait_for('message', check=check)
